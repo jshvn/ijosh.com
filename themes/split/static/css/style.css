@@ -1,0 +1,100 @@
+/* button styles */
+.button {
+    display: inline-block;
+    text-decoration: none;
+    border-radius: 0; /* reset border radius on iOS */
+  }
+    
+  .button--rect {
+    font-family: "PT Sans";
+    padding: 5px 20px;
+    font-size: 14px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: .28em;
+    font-style: normal;
+    border: 2px solid;
+    border-radius: 4px;
+    transition: all .1s ease-out;
+  }
+      
+    .button--rect--dark {
+        color: #FFF;
+        background-color: #1C1C1C;
+        border-color: #1C1C1C;
+  
+        &:hover {
+          color: #FFF;
+        }
+    }
+  
+    .button--rect--light {
+        color: #000;
+        background-color: rgba(255,255,255,.9);
+        border-color: rgba(255, 255, 255, 0);
+  
+        &:hover {
+          color: #000;
+          background-color: #FFF;
+          border-color: #FFF;
+        }
+    }
+    
+  .button--curv {
+    padding: 5.5px 22px;
+    border-radius: 100px;
+    line-height: 22px;
+    font-size: 12px;
+    transition: all .2s ease-in-out;
+  }
+  
+    .button--curv--dark {
+        background-color: #3E3E3E;
+        color: #FFF;
+  
+        &:hover {
+          background-color: #000;
+        }
+    }
+    
+  
+  /* uneeded styles to make the pen look better */  
+  * {Box-sizing: Border-box}
+  
+  html,
+  body {
+    height: 100%;
+  }
+  
+  section {
+    display: flex;
+    float: left;
+    width: 33%;
+    min-height: 100%;
+    justify-content:left;
+    align-items:left;
+   
+    &.dark {
+      background-color: #000;
+    }
+
+    &.dark-icons {
+      justify-content: right;
+      align-items: right;
+    }
+    
+    &.light {
+      background-color: #F2F2F2;
+    }
+  }
+  
+  .spacer {
+    width: 15px;
+  }
+
+  .connect--button {
+    display:flex;
+    float:center;
+    width:100%;
+    min-height: 100%;
+  }

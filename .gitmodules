@@ -1,3 +1,0 @@
-[submodule "themes/split"]
-	path = themes/split
-	url = git@github.com:escalate/hugo-split-theme.git
