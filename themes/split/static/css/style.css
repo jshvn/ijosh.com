@@ -68,7 +68,6 @@
   
   section {
     display: flex;
-    float: left;
     width: 33%;
     min-height: 100%;
     justify-content:left;
@@ -76,6 +75,7 @@
    
     &.dark {
       background-color: #000;
+      margin-right:15px;
     }
 
     &.dark-icons {
@@ -92,9 +92,19 @@
     width: 15px;
   }
 
-  .connect--button {
-    display:flex;
-    float:center;
+  .button-container {
+    display: flex;
+    float: left;
     width:100%;
     min-height: 100%;
+  }
+
+  #connectbutton {
+    width:100%;
+  }
+
+  #connectbuttoncontainer {
+    margin-right:25px;
+    text-align: center;
+    width: 130px;
   }
