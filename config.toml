@@ -20,7 +20,10 @@ copyright = "&copy;2021 Josh Vaughen"
   twitterHandle = "dvnll"
 
   # Favicon
-  favicon = "images/_favicon.png"
+  favicon = "images/favicon.png"
+
+  [params.custom.css]
+    enable = true
 
   # Section - Visual
   [params.visual]
