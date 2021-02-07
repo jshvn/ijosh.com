@@ -1,12 +1,14 @@
 # 👨🏻‍💻 ijosh.com
 
-This repository contains the contents of [ijosh.com](https://ijosh.com). It is a Hugo based jamstack site that was migrated over from SquareSpace and now deployed on Cloudflare.
+This repository contains the contents of [ijosh.com](https://ijosh.com). It is a Hugo-based jamstack site that was migrated over from SquareSpace and now deployed on Cloudflare Pages.
 
 ***
 
 ## 🛠 Overview
 
-Testing.
+Whenever changes are pushed to the master branch they will automatically be picked up by Cloudflare and deployed live to the web. As such, development is suggested in any branch other than master.
+
+The theme is adapted from this theme: [https://themes.gohugo.io/hugo-split-theme/](https://themes.gohugo.io/hugo-split-theme/) and merged with the color scheme and similar from the older Squarespace site.
 
 
 ## 👥 Social Icons
