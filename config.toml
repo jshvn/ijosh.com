@@ -1,6 +1,5 @@
 # Site settings
-# update base url later to https://ijosh.com/
-baseURL = "https://josh.ws/"
+baseURL = "https://ijosh.com/"
 languageCode = "en-US"
 title = "Josh Vaughen"
 theme = "split"
