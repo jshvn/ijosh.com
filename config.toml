@@ -21,6 +21,9 @@ copyright = "&copy;2021 Josh Vaughen"
 
   [params.custom.css]
     enable = true
+  
+  [params.showemail]
+    enable = false
 
   # Section - Visual
   [params.visual]
