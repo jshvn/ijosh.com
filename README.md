@@ -2,8 +2,6 @@
 
 This repository contains the contents of [ijosh.com](https://ijosh.com). It is a Hugo-based jamstack site that was migrated over from SquareSpace and now deployed on Cloudflare Pages.
 
-NOTE: Until Cloudflare resolves zone issues that allow automatic HTTPS rewrites and other features, this site will continue to live on [josh.ws](https://josh.ws).
-
 ***
 
 ## 🛠 Overview
