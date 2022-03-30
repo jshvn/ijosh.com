@@ -6,14 +6,14 @@ theme = "split"
 disableKinds = ["section", "taxonomy", "taxonomyTerm", "RSS", "sitemap"]
 
 # Copyright
-copyright = "&copy;2021 Josh Vaughen"
+copyright = "&copy;2022 Josh Vaughen"
 
 [params]
 
   # Metadata for search engines and social sharing
   author = "Josh Vaughen"
-  description = "Connect with Josh Vaughen to learn about his interest in data science, machine learning, and artificial intelligence."
-  shareImage = "images/_22A2175.jpg"
+  description = "Josh Vaughen is a machine learning engineer at Adobe interested in nascent technology and the great outdoors."
+  shareImage = "images/profile.jpg"
   twitterHandle = "dvnll"
 
   # Favicon
@@ -28,7 +28,7 @@ copyright = "&copy;2021 Josh Vaughen"
     # Image
     [params.visual.image]
       enable = true
-      file = "images/_22A2175.jpg"
+      file = "images/profile.jpg"
       position = "center center"
 
   # The original template is released under the Creative Commons Attribution 3.0 License.
