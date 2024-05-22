@@ -6,7 +6,7 @@ theme = "split"
 disableKinds = ["section", "taxonomy", "taxonomyTerm", "RSS", "sitemap"]
 
 # Copyright
-copyright = "&copy;2022 Josh Vaughen"
+copyright = "&copy;2024 Josh Vaughen"
 
 [params]
 
