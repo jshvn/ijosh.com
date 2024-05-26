@@ -242,7 +242,7 @@ body.page-template-page-fullsingle-split p {
 }
 
 .split-intro .location {
-    margin-top: 40px; /* Ensures 40px spacing from the previous element */
+    margin-top: 30px; /* Ensures 40px spacing from the previous element */
   }
 
 .split-bio {
