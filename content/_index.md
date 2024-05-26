@@ -1,6 +1,8 @@
 +++
 title = "Josh Vaughen"
 tagline = "Engineer, Traveler, Gymrat"
+location = "📍•Seattle"
+emojis = "🙋🏻‍♂️•🇺🇸🇬🇷🏳️‍🌈"
 +++
 
 I'm a machine learning engineer with a fierce passion for solo travel and fitness.

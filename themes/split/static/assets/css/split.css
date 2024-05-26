@@ -217,7 +217,33 @@ body.page-template-page-fullsingle-split p {
 }
 .split-intro .tagline {
   color: hsla(0, 0%, 20%);
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: block;
 }
+
+.split-intro .location,
+.split-intro .emojis {
+  color: hsla(0, 0%, 20%);
+  display: block; /* or inline-block */
+  margin-top: 10px;
+
+  /* Matching .tagline's font properties */
+  font-family: "Graduate";
+  font-weight: 200;
+  font-style: normal;
+  text-transform: none;
+  letter-spacing: 0.28em;
+  text-rendering: optimizeLegibility;
+
+  /* Smaller font size */
+  font-size: 14px; /* Adjust this value to the desired smaller size */
+  line-height: 1em;
+}
+
+.split-intro .location {
+    margin-top: 40px; /* Ensures 40px spacing from the previous element */
+  }
 
 .split-bio {
   padding: 40px 0 20px 0;
