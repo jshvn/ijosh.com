@@ -1,10 +1,12 @@
 +++
 title = "Josh Vaughen"
-tagline = "Machine Learning @ Adobe"
+tagline = "Engineer, Traveler, Gymrat"
 +++
 
-I do machine learning and data science things at Adobe. I am fascinated by nascent tech and am currently focused on 3D apps and immersive experiences. Both metaverse and crypto are neat.
+I'm a machine learning engineer with a fierce passion for solo travel and fitness.
 
-I am happiest out on the trail or lost in a foreign city.
+I spend my time tinkering with software and gadgets, exploring new countries, practicing my lifts, running, yoga, or in a Barry's class. #fitfam
 
-Connect with me on social below or shoot me an email. 
+I'm enormously grateful to have spent the last year on sabbatical traveling all over Earth connecting with beautiful humans far and wide.
+
+Love to connect with new folks? Add me on socials below or send me an email!
