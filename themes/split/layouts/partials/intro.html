@@ -1,6 +1,10 @@
 <div class="split-intro">
   {{ with .Title }}<h1>{{ . }}</h1>{{ end }}
   {{ with .Params.tagline }}<span class="tagline">{{ . }}</span>{{ end }}
-  {{ with .Params.location }}<span class="location">{{ . }}</span>{{ end }}
-  {{ with .Params.emojis }}<span class="emojis">{{ . }}</span>{{ end }}
+  {{ if .Site.Params.showlocation.enable }}
+    {{ with .Params.location }}<span class="location">{{ . }}</span>{{ end }}
+  {{ end }}
+  {{ if .Site.Params.showemojis.enable }}
+    {{ with .Params.emojis }}<span class="emojis">{{ . }}</span>{{ end }}
+  {{ end }}
 </div>

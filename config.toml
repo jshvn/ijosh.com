@@ -25,6 +25,15 @@ copyright = "&copy;2024 Josh Vaughen"
   [params.showemail]
     enable = true
 
+  [params.showtwitter]
+    enable = false
+
+  [params.showlocation]
+    enable = true
+
+  [params.showemojis]
+    enable = true
+
   # Section - Visual
   [params.visual]
 
