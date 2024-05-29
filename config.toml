@@ -8,6 +8,12 @@ disableKinds = ["section", "taxonomy", "taxonomyTerm", "RSS"]
 # Copyright
 copyright = "&copy;2024 Josh Vaughen"
 
+[sitemap]
+  changeFreq = 'monthly'
+  disable = false
+  filename = 'sitemap.xml'
+  priority = 0.8
+
 [params]
 
   # Metadata for search engines and social sharing
