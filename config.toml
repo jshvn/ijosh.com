@@ -13,7 +13,7 @@ copyright = "&copy;2024 Josh Vaughen"
   # Metadata for search engines and social sharing
   author = "Josh Vaughen"
   description = "Josh Vaughen is a machine learning engineer with a fierce passion for solo travel and fitness."
-  shareImage = "images/profile.jpg"
+  shareImage = "images/profile.webp"
   twitterHandle = "dvnll"
 
   # Favicon
@@ -40,7 +40,7 @@ copyright = "&copy;2024 Josh Vaughen"
     # Image
     [params.visual.image]
       enable = true
-      file = "images/profile.jpg"
+      file = "images/profile.webp"
       position = "center center"
 
   # The original template is released under the Creative Commons Attribution 3.0 License.
