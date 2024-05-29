@@ -9,7 +9,7 @@ disableKinds = ["section", "taxonomy", "taxonomyTerm", "RSS"]
 copyright = "&copy;2024 Josh Vaughen"
 
 [sitemap]
-  changeFreq = 'monthly'
+  changeFreq = 'always'
   disable = false
   filename = 'sitemap.xml'
   priority = 0.8
