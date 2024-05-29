@@ -3,7 +3,7 @@ baseURL = "https://ijosh.com/"
 languageCode = "en-US"
 title = "Josh Vaughen"
 theme = "split"
-disableKinds = ["section", "taxonomy", "taxonomyTerm", "RSS", "sitemap"]
+disableKinds = ["section", "taxonomy", "taxonomyTerm", "RSS"]
 
 # Copyright
 copyright = "&copy;2024 Josh Vaughen"
