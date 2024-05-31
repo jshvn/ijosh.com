@@ -32,7 +32,10 @@ copyright = "&copy;2024 Josh Vaughen"
     enable = true
 
   [params.showtwitter]
-    enable = false
+    enable = true
+
+  [params.showgithub]
+    enable = true
 
   [params.showlocation]
     enable = true
