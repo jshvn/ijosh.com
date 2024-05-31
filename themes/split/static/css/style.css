@@ -81,7 +81,6 @@
     &.dark-icons {
       justify-content: right;
       align-items: right;
-      margin-left: 15px;
     }
     
     &.light {
@@ -91,7 +90,6 @@
   
   .spacer {
     width: 15px;
-    min-width: 5px;
   }
 
   .button-container {
@@ -109,5 +107,4 @@
     margin-right:25px;
     text-align: center;
     width: 130px;
-    border-radius: 5px;
   }
