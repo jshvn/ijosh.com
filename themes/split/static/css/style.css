@@ -101,10 +101,14 @@
 
   #connectbutton {
     width:100%;
+    border-radius: 3px; /* 15px rounded corners */
+    border-spacing: 5px;
   }
 
   #connectbuttoncontainer {
     margin-right:25px;
     text-align: center;
     width: 130px;
+    border-radius: 3px; /* 15px rounded corners */
+    border-spacing: 5px;
   }

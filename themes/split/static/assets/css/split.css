@@ -220,18 +220,29 @@ body.page-template-page-fullsingle-split p {
   margin-top: 20px;
   margin-bottom: 20px;
   display: block;
+  font-size: 115%;
 }
 
 .location-wrapper {
     display: inline-flex; /* or inline-block */
     align-items: center; /* vertically aligns the icon and text */
     color: hsla(0, 0%, 20%);
+    
+    padding: 5px;
+    background-color: hsla(0, 0%, 20%, 0.1); /* Black background with 50% opacity */
+    border-radius: 3px; /* 15px rounded corners */
+    border-spacing: 5px;
   }
 
 .emojis-wrapper {
     display: inline-flex; /* or inline-block */
     align-items: center; /* vertically aligns the icon and text */
     color: hsla(0, 0%, 20%);
+
+    padding: 5px;
+    background-color: hsla(0, 0%, 20%, 0.1); /* Black background with 50% opacity */
+    border-radius: 3px; /* 15px rounded corners */
+    border-spacing: 5px;
 }
 
 /* This class name should match the Font Awesome icon name */
