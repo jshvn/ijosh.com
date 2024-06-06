@@ -2,8 +2,8 @@
 lastmod = 2024-05-29T04:14:54-08:00
 title = "Josh Vaughen"
 tagline = "Engineer, Traveler, Gymrat"
-location = "📍•Seattle"
-emojis = "🙋🏻‍♂️•🇺🇸🇬🇷🏳️‍🌈"
+location = "Barcelona"
+emojis = "🇺🇸🇬🇷🏳️‍🌈"
 +++
 
 I'm a machine learning engineer with a fierce passion for solo travel and fitness.

@@ -222,28 +222,48 @@ body.page-template-page-fullsingle-split p {
   display: block;
 }
 
-.split-intro .location,
-.split-intro .emojis {
-  color: hsla(0, 0%, 20%);
-  display: block; /* or inline-block */
-  margin-top: 10px;
+.location-wrapper {
+    display: inline-flex; /* or inline-block */
+    align-items: center; /* vertically aligns the icon and text */
+    color: hsla(0, 0%, 20%);
+  }
 
-  /* Matching .tagline's font properties */
-  font-family: "Graduate";
-  font-weight: 200;
-  font-style: normal;
-  text-transform: none;
-  letter-spacing: 0.28em;
-  text-rendering: optimizeLegibility;
-
-  /* Smaller font size */
-  font-size: 14px; /* Adjust this value to the desired smaller size */
-  line-height: 1em;
+.emojis-wrapper {
+    display: inline-flex; /* or inline-block */
+    align-items: center; /* vertically aligns the icon and text */
+    color: hsla(0, 0%, 20%);
 }
 
-.split-intro .location {
-    margin-top: 30px; /* Ensures 40px spacing from the previous element */
-  }
+/* This class name should match the Font Awesome icon name */
+.fa-location-dot {
+    margin-right: 5px; /* Adjust as needed for spacing between icon and text */
+    font-size: 1em; /* Ensure the icon size is appropriate */
+}
+
+/* This class name should match the Font Awesome icon name */
+.fa-id-badge {
+    margin-right: 5px; /* Adjust as needed for spacing between icon and text */
+    font-size: 1em; /* Ensure the icon size is appropriate */
+}
+  
+.split-intro .location,
+.split-intro .emojis {
+    color: hsla(0, 0%, 20%);
+    display: inline-block;
+    /* margin-top: 10px; */
+  
+    /* Matching .tagline's font properties */
+    font-family: "Graduate";
+    font-weight: 200;
+    font-style: normal;
+    text-transform: none;
+    letter-spacing: 0.28em;
+    text-rendering: optimizeLegibility;
+  
+    /* Smaller font size */
+    font-size: 14px; /* Adjust this value to the desired smaller size */
+    line-height: 1em;
+}
 
 .split-bio {
   padding: 40px 0 20px 0;
