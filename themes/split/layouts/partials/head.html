@@ -44,6 +44,15 @@
   <meta itemprop="image" content="{{ . | absURL }}"/>
 {{ end }}
 
+<script type="application/ld+json">
+    {"@context":"https://schema.org",
+    "@type":"WebSite",
+    {{ with .Site.Params.description }}"description":"{{ . }}",{{ end }}
+    {{ with .Site.Params.author }}"headline":"{{ . }}",
+    "name":"{{ . }}",{{ end }}
+    "url":"{{ .Site.BaseURL }}"}
+</script>
+
 {{ with .Site.Params.twitterHandle }}
   <meta name="twitter:site" content="@{{ . }}" />
 {{ end }}
