@@ -32,6 +32,10 @@
 <meta name="twitter:url" content="{{ .Site.BaseURL }}" />
 <meta itemprop="url" content="{{ .Site.BaseURL }}"/>
 
+{{ with site.LanguageCode }}
+<meta property="og:locale" content="{{ . }}">
+{{ end }}
+
 {{ with .Site.Params.shareImage }}
   <meta property="og:image" content="{{ . | absURL }}" />
   <meta property="og:image:width" content="1500"/>
