@@ -1,5 +1,4 @@
 +++
-lastmod = 2024-05-29T04:14:54-08:00
 title = "Josh Vaughen"
 tagline = "Engineer, Traveler, Gymrat"
 location = "Barcelona"
