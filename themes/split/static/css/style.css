@@ -90,6 +90,7 @@
   
   .spacer {
     width: 15px;
+    min-width: 5px;
   }
 
   .button-container {

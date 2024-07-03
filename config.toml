@@ -31,6 +31,9 @@ copyright = "&copy;2024 Josh Vaughen"
   [params.showemail]
     enable = true
 
+  [params.showgithub]
+    enable = true
+
   [params.showtwitter]
     enable = false
 

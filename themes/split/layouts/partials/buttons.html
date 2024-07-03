@@ -3,10 +3,15 @@
         <a class="button button--rect button--rect--dark" aria-label="Click here to connect with Josh on Instagram" title="Instagram" id="connectbutton" href="https://instagram.com/joshthings">Connect</a>
     </section>
     <section class="dark-icons">
+        <span class="spacer"></span>
         <a aria-label="Click here to connect with Josh on Instagram" title="Instagram" class="button fab fa-instagram" href="https://instagram.com/joshthings" style="font-size: 28px; padding-top: 9.5px;"></a>
         <span class="spacer"></span>
         <a aria-label="Click here to connect with Josh on LinkedIn" title="LinkedIn" class="button fab fa-linkedin-in" href="https://linkedin.com/in/ijosh" style="font-size: 28px; padding-top: 9.5px;"></a>
         <span class="spacer"></span>
+        {{ if .Site.Params.showgithub.enable }}
+        <a aria-label="Click here to connect with Josh on GitHub" title="GitHub" class="button fab fa-github" href="https://github.com/ijosh" style="font-size: 28px; padding-top: 9.5px;"></a>
+        <span class="spacer"></span>
+        {{ end }}
         {{ if .Site.Params.showtwitter.enable }}
         <a aria-label="Click here to connect with Josh on X" title="X" class="button fab fa-x-twitter" href="https://x.com/dvnll" style="font-size: 28px; padding-top: 9.5px;"></a>
         <span class="spacer"></span>
