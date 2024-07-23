@@ -50,9 +50,7 @@ body.page-template-page-fullsingle-split {
   line-height: 33px;
   letter-spacing: -0.2px;
   color: $color-text;
-  /* disabling the fadein animation for now as it 
-  negatively impacts the page load time for mobile browsers
-  animation: fadein 2s;*/
+  animation: fadein 2s;
 
   //-------------------------------------------------------------------------------
   // Global Styles
