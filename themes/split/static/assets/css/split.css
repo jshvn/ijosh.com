@@ -124,7 +124,9 @@ body.page-template-page-fullsingle-split {
   line-height: 33px;
   letter-spacing: -0.2px;
   color: #848d96;
-  animation: fadein 2s;
+  /* disabling the fadein animation for now as it 
+  negatively impacts the page load time for mobile browsers
+  animation: fadein 2s;*/
 }
 
 /* paragraph text */
