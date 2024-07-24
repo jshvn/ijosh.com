@@ -50,7 +50,7 @@ body.page-template-page-fullsingle-split {
   line-height: 33px;
   letter-spacing: -0.2px;
   color: $color-text;
-  animation: fadein 2s;
+  animation: fadein 1s;
 
   //-------------------------------------------------------------------------------
   // Global Styles
