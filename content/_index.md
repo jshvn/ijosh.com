@@ -1,7 +1,7 @@
 +++
 title = "Josh Vaughen"
 tagline = "Engineer, Traveler, Gymrat"
-location = "Barcelona"
+location = "Seattle"
 emojis = "🇺🇸🇬🇷🏳️‍🌈"
 +++
 
