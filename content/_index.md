@@ -1,6 +1,6 @@
 +++
 title = "Josh Vaughen"
-tagline = "Engineer, Traveler, Gymrat"
+tagline = "Engineer, Explorer, Gymrat"
 location = "Seattle"
 emojis = "🇺🇸🇬🇷🏳️‍🌈"
 +++
