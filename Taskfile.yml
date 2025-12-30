@@ -1,0 +1,22 @@
+version: "3"
+
+vars:
+  GIT_DIR:
+    sh: pwd
+
+tasks:
+  default:
+    desc: List all available tasks
+    cmds:
+      - task --list
+
+  server:
+    desc: Build and serve hugo content
+    cmds:
+      - hugo server -D -w
+
+  clean:
+    desc: Remove generated and auxiliary files
+    cmds:
+      - rm -rf {{.GIT_DIR}}/public/
+      - rm -f .hugo_build*
