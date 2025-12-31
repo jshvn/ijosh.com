@@ -12,6 +12,7 @@ tasks:
 
   server:
     desc: Build and serve hugo content
+    aliases: [ serve, serv ]
     cmds:
       - hugo server -D -w
 
@@ -19,4 +20,5 @@ tasks:
     desc: Remove generated and auxiliary files
     cmds:
       - rm -rf {{.GIT_DIR}}/public/
-      - rm -f .hugo_build*
+      - rm -rf {{.GIT_DIR}}/resources/
+      - rm -f {{.GIT_DIR}}/.hugo_build*
