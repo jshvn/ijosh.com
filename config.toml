@@ -2,7 +2,6 @@
 baseURL = "https://ijosh.com/"
 languageCode = "en-US"
 title = "Josh Vaughen"
-theme = "split"
 disableKinds = ["section", "taxonomy", "RSS"]
 
 # Copyright
@@ -18,12 +17,21 @@ copyright = "&copy;2024 Josh Vaughen"
 
   # Metadata for search engines and social sharing
   author = "Josh Vaughen"
+  firstName = "Josh"
   description = "Josh Vaughen is a machine learning engineer with a fierce passion for solo travel and fitness."
   shareImage = "images/profile.webp"
   twitterHandle = "dvnll"
 
   # Favicon
   favicon = "images/favicon.png"
+
+  # Social Links
+  [params.social]
+    email = "josh@vaughen.net"
+    instagram = "https://instagram.com/joshthings"
+    linkedin = "https://linkedin.com/in/ijosh"
+    github = "https://github.com/jshvn"
+    twitter = "https://x.com/dvnll"
 
   [params.custom.css]
     enable = true

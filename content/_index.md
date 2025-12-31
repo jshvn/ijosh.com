@@ -1,14 +1,14 @@
 +++
 title = "Josh Vaughen"
-tagline = "Engineer, Explorer, Lifter"
+tagline = "Engineer, Explorer, Trainer"
 location = "Seattle"
 emojis = "🇺🇸🇬🇷🏳️‍🌈"
 +++
 
-I build software and stay curious—about tech, the world, and what the body can do with consistent work.
+I work in machine learning and value disciplined progress in how I train, think, and live.
 
-I took a deliberate break from work to travel solo across over 60 countries. The result was a stronger perspective on people, cultures, and how I want to spend my time: building useful things, staying in great shape, and continuing to explore.
+Over the last few years, I solo traveled across 60+ new countries, which helped me clarify my values and become very intentional about how I spend my time.
 
-These days I’m focused on shipping products, pushing new PRs in the gym, and planning the next trip.
+Now I’m focused on what’s next: training hard, traveling often, and doing meaningful work in the machine learning space.
 
-If you want to connect—whether it’s engineering, training, or travel—feel free to reach out by email or say hi on Instagram.
+If you’d like to connect about machine learning, fitness, or travel, feel free to reach out by email or say hi on Instagram.
