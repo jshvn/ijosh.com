@@ -1,0 +1,24 @@
+<section class="button-container">
+    <section class="dark" id="connectbuttoncontainer">
+        <a class="button button--rect button--rect--dark" aria-label="Click here to connect with {{ .Site.Params.firstName }} on Instagram" title="Instagram" id="connectbutton" href="{{ .Site.Params.social.instagram }}">Connect</a>
+    </section>
+    <section class="dark-icons">
+        <span class="spacer"></span>
+        <a aria-label="Click here to connect with {{ .Site.Params.firstName }} on Instagram" title="Instagram" class="button fab fa-instagram" href="{{ .Site.Params.social.instagram }}" style="font-size: 28px; padding-top: 9.5px;"></a>
+        <span class="spacer"></span>
+        <a aria-label="Click here to connect with {{ .Site.Params.firstName }} on LinkedIn" title="LinkedIn" class="button fab fa-linkedin-in" href="{{ .Site.Params.social.linkedin }}" style="font-size: 28px; padding-top: 9.5px;"></a>
+        <span class="spacer"></span>
+        {{ if .Site.Params.showgithub.enable }}
+        <a aria-label="Click here to connect with {{ .Site.Params.firstName }} on GitHub" title="GitHub" class="button fab fa-github" href="{{ .Site.Params.social.github }}" style="font-size: 28px; padding-top: 9.5px;"></a>
+        <span class="spacer"></span>
+        {{ end }}
+        {{ if .Site.Params.showtwitter.enable }}
+        <a aria-label="Click here to connect with {{ .Site.Params.firstName }} on X" title="X" class="button fab fa-x-twitter" href="{{ .Site.Params.social.twitter }}" style="font-size: 28px; padding-top: 9.5px;"></a>
+        <span class="spacer"></span>
+        {{ end }}
+        {{ if .Site.Params.showemail.enable }}
+        <a aria-label="Click here to send {{ .Site.Params.firstName }} an email" title="Email" class="button far fa-envelope" href="mailto:{{ .Site.Params.social.email }}" style="font-size: 28px; padding-top: 9.5px;"></a>
+        <span class="spacer"></span>
+        {{ end }}
+    </section>
+</section>

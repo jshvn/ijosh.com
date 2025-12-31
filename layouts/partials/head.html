@@ -12,7 +12,12 @@
 <meta name="robots" content="index, follow" />
 <meta name="referrer" content="always" />
 
-{{ with .Site.Params.favicon }}<link rel="shortcut icon" type="image/x-icon" href="{{ . | absURL }}"  />{{ end }}
+{{- with .Site.Params.favicon }}
+  {{- with resources.Get . }}
+    <link rel="shortcut icon" type="image/x-icon" href="{{ .RelPermalink }}" />
+    <link rel="icon" href="{{ .RelPermalink }}" />
+  {{- end }}
+{{- end }}
 <link rel="canonical" href="{{ .Site.BaseURL }}"/>
 
 <!-- Social & Open Graph -->
@@ -36,17 +41,20 @@
 <meta property="og:locale" content="{{ . }}">
 {{ end }}
 
-{{ with .Site.Params.shareImage }}
-  <meta property="og:image" content="{{ . | absURL }}" />
-  <meta property="og:image:width" content="1500"/>
-  <meta property="og:image:height" content="2250"/>
-  <meta property="og:type" content="website"/>
-  <meta name="twitter:image" content="{{ . | absURL }}" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta itemprop="thumbnailUrl" content="{{ . | absURL }}"/>
-  <link rel="image_src" href="{{ . | absURL }}" />
-  <meta itemprop="image" content="{{ . | absURL }}"/>
-{{ end }}
+{{- with .Site.Params.shareImage }}
+  {{- with resources.Get . }}
+    {{- $shareURL := .Permalink }}
+    <meta property="og:image" content="{{ $shareURL }}" />
+    <meta property="og:image:width" content="1500"/>
+    <meta property="og:image:height" content="2250"/>
+    <meta property="og:type" content="website"/>
+    <meta name="twitter:image" content="{{ $shareURL }}" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta itemprop="thumbnailUrl" content="{{ $shareURL }}"/>
+    <link rel="image_src" href="{{ $shareURL }}" />
+    <meta itemprop="image" content="{{ $shareURL }}"/>
+  {{- end }}
+{{- end }}
 
 <script type="application/ld+json">
 {
@@ -63,26 +71,23 @@
   <meta name="twitter:site" content="@{{ . }}" />
 {{ end }}
 
-<!-- Favicon -->
-{{ with .Site.Params.favicon }}
-  <link rel="icon" href="{{ . | absURL }}" />
-{{ end }}
-
 <!-- Styles -->
-<link rel="stylesheet" href="{{ "assets/css/split.css" | absURL }}" type="text/css" media="screen" />
+<link rel="stylesheet" href="{{ "css/split.css" | relURL }}" type="text/css" media="screen" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 {{ if .Site.Params.custom.css.enable }}
-<link rel="stylesheet" href="{{ "css/style.css" | absURL }}" type="text/css" media="screen" />
+<link rel="stylesheet" href="{{ "css/style.css" | relURL }}" type="text/css" media="screen" />
 {{ end }}
 
 <!-- Image Styles -->
-{{ if .Site.Params.visual.image.enable }}
-  <style>
-  {{ if .Site.Params.visual.image.file }}
-    .fs-split .split-image { background-image: url("{{ .Site.Params.visual.image.file | absURL }}"); background-position: {{ if .Site.Params.visual.image.position }}{{ .Site.Params.visual.image.position }}{{ else }}center center{{ end }}; }
-  {{ end }}
-  </style>
-{{ end }}
+{{- if .Site.Params.visual.image.enable }}
+  {{- with .Site.Params.visual.image.file }}
+    {{- with resources.Get . }}
+      <style>
+        .fs-split .split-image { background-image: url("{{ .RelPermalink }}"); background-position: {{ if $.Site.Params.visual.image.position }}{{ $.Site.Params.visual.image.position }}{{ else }}center center{{ end }}; }
+      </style>
+    {{- end }}
+  {{- end }}
+{{- end }}
 
 <!-- Google Analytics -->
 {{ if and (.Site.Config.Services.GoogleAnalytics.ID) (not (in (printf "%#v" .Site.BaseURL) "localhost")) }}
