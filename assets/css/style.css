@@ -116,6 +116,11 @@ section.light {
   align-items: center;
   margin-right: 10px;
 }
+/* explicit gap between the location and emoji pills — the theme otherwise
+   relies on fragile inline whitespace that the pills' width can swallow */
+.location-wrapper {
+  margin-right: 12px;
+}
 .split-meta-icon svg {
   width: auto;
   height: 16px;
