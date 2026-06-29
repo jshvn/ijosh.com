@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Locale | default "en-us" }}">
+
+<head>
+  {{ partial "head" . }}
+</head>
+
+<body id="fullsingle" class="page-template-page-fullsingle-split">
+
+  <div class="fs-split">
+    <div class="split-content">
+      <div class="split-content-vertically-center">
+        <div class="split-intro">
+          <h1>404</h1>
+          <span class="tagline">This page wandered off.</span>
+        </div>
+        <div class="split-bio">
+          <p><a href="{{ "/" | relURL }}">&larr; Back to home</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
