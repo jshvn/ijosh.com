@@ -12,4 +12,8 @@ hugo.linux
 # Temporary lock file while building
 /.hugo_build.lock
 
+# Visual regression tooling (golden baselines ARE committed; these are not)
+/.venv-visual/
+/tests/visual/out/
+
 .DS_Store
