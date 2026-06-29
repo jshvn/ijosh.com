@@ -24,8 +24,10 @@ task build     # production build → public/  (hugo --minify --gc)
 task --list    # all tasks
 ```
 
-> **Cloudflare Pages build command must be `hugo --minify --gc`.** Hugo only minifies the
-> HTML when that flag is set (CSS/fonts are already minified via the asset pipeline).
+> **Cloudflare Pages settings (dashboard):** build command `hugo --minify --gc` (Hugo only
+> minifies HTML with that flag; CSS/fonts are minified by the asset pipeline), and pin the
+> **`HUGO_VERSION`** env var to the tested extended version (currently `0.163.3`; extended is
+> required for WebP image processing).
 
 ## 🎨 Assets
 
