@@ -78,7 +78,7 @@ img.aligncenter {
 }
 
 body {
-  background-color: #FFFFFF;
+  background-color: var(--bg);
   border-style: none;
 }
 
@@ -86,7 +86,7 @@ body,
 p,
 a,
 a:hover:not(.button) {
-  color: #000000;
+  color: var(--text);
 }
 
 
@@ -99,28 +99,19 @@ a:hover:not(.button) {
 }
 
 /* -- Content -- */
-@keyframes fadein {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
 html {
-  background-color: hsla(0, 0%, 100%);
+  background-color: var(--bg);
 }
 
 /* right pane background color */
 body.page-template-page-fullsingle-split {
-  background-color: hsla(0, 0%, 100%);
+  background-color: var(--bg);
   font-family: "Montserrat", sans-serif;
   font-weight: 400;
   font-size: 21px;
   line-height: 33px;
   letter-spacing: -0.2px;
-  color: #848d96;
-  animation: fadein 1s;
+  color: var(--text-muted);
 }
 
 /* paragraph text */
@@ -131,7 +122,7 @@ body.page-template-page-fullsingle-split p {
   font-size: 16px;
   letter-spacing: 0.01em;
   line-height: 1.4em;
-  color: hsla(0, 0%, 20%, 0.6);
+  color: var(--text-body);
 }
 
 .fs-split {
@@ -205,14 +196,14 @@ body.page-template-page-fullsingle-split p {
   font-family: "Montserrat";
   font-weight: 700;
   text-transform: uppercase;
-  font-size: 54px;
+  font-size: clamp(2.25rem, 5vw + 1rem, 3.375rem); /* fluid; caps at the prior 54px */
   line-height: 1em;
   margin-bottom: 40px;
   font-style: normal;
-  color: hsla(0, 0%, 20%);
+  color: var(--text);
 }
 .split-intro .tagline {
-  color: hsla(0, 0%, 20%);
+  color: var(--text);
   margin-top: 20px;
   margin-bottom: 20px;
   display: block;
@@ -222,10 +213,10 @@ body.page-template-page-fullsingle-split p {
 .location-wrapper {
     display: inline-flex; /* or inline-block */
     align-items: center; /* vertically aligns the icon and text */
-    color: hsla(0, 0%, 20%);
-    
+    color: var(--text);
+
     padding: 5px;
-    background-color: hsla(0, 0%, 20%, 0.1); /* Black background with 50% opacity */
+    background-color: var(--pill-bg);
     border-radius: 3px; /* 15px rounded corners */
     border-spacing: 5px;
   }
@@ -233,10 +224,10 @@ body.page-template-page-fullsingle-split p {
 .emojis-wrapper {
     display: inline-flex; /* or inline-block */
     align-items: center; /* vertically aligns the icon and text */
-    color: hsla(0, 0%, 20%);
+    color: var(--text);
 
     padding: 5px;
-    background-color: hsla(0, 0%, 20%, 0.1); /* Black background with 50% opacity */
+    background-color: var(--pill-bg);
     border-radius: 3px; /* 15px rounded corners */
     border-spacing: 5px;
 }
@@ -252,13 +243,13 @@ body.page-template-page-fullsingle-split p {
     margin-right: 5px; /* Adjust as needed for spacing between icon and text */
     font-size: 1em; /* Ensure the icon size is appropriate */
 }
-  
+
 .split-intro .location,
 .split-intro .emojis {
-    color: hsla(0, 0%, 20%);
+    color: var(--text);
     display: inline-block;
     /* margin-top: 10px; */
-  
+
     /* Matching .tagline's font properties */
     font-family: "Graduate";
     font-weight: 200;
@@ -266,7 +257,7 @@ body.page-template-page-fullsingle-split p {
     text-transform: none;
     letter-spacing: 0.28em;
     text-rendering: optimizeLegibility;
-  
+
     /* Smaller font size */
     font-size: 14px; /* Adjust this value to the desired smaller size */
     line-height: 1em;
@@ -287,19 +278,19 @@ body.page-template-page-fullsingle-split p {
   }
 }
 .split-bio p {
-  color: #848d96;
+  color: var(--text-body);
   margin-bottom: 20px;
   line-height: inherit;
 }
 .split-bio a {
-  color: #848d96;
+  color: var(--text-muted);
   transition-duration: 0.5s;
-  border-bottom: 1px dotted #848d96;
+  border-bottom: 1px dotted var(--text-muted);
 }
 .split-bio a:hover {
-  color: #CA486d;
+  color: var(--accent);
   transition-duration: 0.1s;
-  border-bottom: 1px dotted #CA486d;
+  border-bottom: 1px dotted var(--accent);
 }
 .split-bio em,
 .split-bio i {
@@ -416,7 +407,7 @@ body.page-template-page-fullsingle-split p {
   font-size: 11px;
   line-height: 11px;
   margin-bottom: 31px;
-  color: #848d96;
+  color: var(--text-muted);
   letter-spacing: 2px;
   opacity: 0.5;
 }
@@ -426,11 +417,11 @@ body.page-template-page-fullsingle-split p {
   margin-bottom: 12px;
 }
 .split-lists .split-list ul li a {
-  color: #848d96;
+  color: var(--text-muted);
   transition-duration: 0.5s;
 }
 .split-lists .split-list ul li a:hover {
-  color: #CA486d;
+  color: var(--accent);
   transition-duration: 0.1s;
 }
 
@@ -442,7 +433,7 @@ body.page-template-page-fullsingle-split p {
   line-height: 14px;
 }
 .split-credit p a {
-  color: #848d96;
+  color: var(--text-muted);
 }
 
 .split-video {

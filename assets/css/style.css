@@ -1,4 +1,52 @@
-/* button styles */
+/* ===== Design tokens ===== */
+:root {
+  color-scheme: light;
+  --bg: #ffffff;
+  --text: #333333;          /* name, tagline, pills, meta icons */
+  --icon: #000000;          /* social icons */
+  --text-muted: #6b7280;    /* UI greys + links — WCAG AA ~4.9:1 on white */
+  --text-body: #4b5563;     /* bio reading text — ~7.5:1 */
+  --accent: #ca486d;        /* link hover */
+  --pill-bg: rgba(51, 51, 51, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --bg: #061c30;          /* brand navy, matches theme-color */
+    --text: #f4f7fb;
+    --icon: #f4f7fb;
+    --text-muted: #9aa7b4;  /* AA on navy */
+    --text-body: #c6d0da;
+    --accent: #e98aa3;      /* lighter pink for dark bg */
+    --pill-bg: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* ===== Modern entry animation (replaces @keyframes fade-in) ===== */
+body.page-template-page-fullsingle-split {
+  opacity: 1;
+  transition: opacity 0.8s ease;
+}
+@starting-style {
+  body.page-template-page-fullsingle-split {
+    opacity: 0;
+  }
+}
+
+/* Respect reduced-motion: neutralize entry fade + hover transitions */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ===== Buttons ===== */
 .button {
   display: inline-block;
   text-decoration: none;
@@ -97,9 +145,9 @@ section.light {
   border-spacing: 5px;
 }
 
-/* inline SVG icons (replaces Font Awesome) */
+/* ===== Inline SVG icons (replaces Font Awesome) ===== */
 .social-icon {
-  color: #000;
+  color: var(--icon);
   line-height: 0;
   transition: opacity .15s ease-out;
 }
