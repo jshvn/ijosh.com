@@ -4,11 +4,6 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="theme-color" content="#061C30" />
 
-<!-- Performance: establish early connections to font/CDN origins -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
-
 <!-- SEO -->
 <title>{{ if .IsPage }}{{ .Title }} - {{ end }}{{ .Site.Title }}</title>
 {{ with .Site.Params.author }}
@@ -17,21 +12,17 @@
 {{ with .Site.Params.description }}
   <meta name="description" content="{{ . }}" />
 {{ end }}
-<meta name="keywords" content="Josh Vaughen, ijosh, machine learning engineer, ML engineer, Seattle engineer, fitness trainer, solo travel, joshthings, Josh, Vaughen" />
 <meta name="robots" content="index, follow" />
-<meta name="referrer" content="always" />
-<meta name="geo.region" content="US-WA" />
-<meta name="geo.placename" content="Seattle" />
-<meta name="geo.position" content="47.6062;-122.3321" />
-<meta name="ICBM" content="47.6062, -122.3321" />
 
 {{- with .Site.Params.favicon }}
   {{- with resources.Get . }}
-    <link rel="shortcut icon" type="image/x-icon" href="{{ .RelPermalink }}" />
-    <link rel="icon" href="{{ .RelPermalink }}" />
+    <link rel="shortcut icon" href="{{ .RelPermalink }}" />
+    <link rel="icon" type="image/png" href="{{ .RelPermalink }}" />
     <link rel="apple-touch-icon" href="{{ .RelPermalink }}" />
   {{- end }}
 {{- end }}
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="manifest" href="/site.webmanifest" />
 <link rel="canonical" href="{{ .Site.BaseURL }}"/>
 
 <!-- Social & Open Graph -->
@@ -161,22 +152,20 @@
   <meta name="twitter:creator" content="@{{ . }}" />
 {{ end }}
 
-<!-- Fonts (moved out of split.css @import: discovered earlier, fetched in parallel, display=swap avoids invisible text) -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,600|Lora|Graduate&display=swap" />
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif&display=swap" />
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<!-- Styles: self-hosted fonts + theme CSS, concatenated, minified, fingerprinted (SRI + immutable caching) -->
+{{- $fonts := resources.Get "css/fonts.css" -}}
+{{- $split := resources.Get "css/split.css" -}}
+{{- $style := resources.Get "css/style.css" -}}
+{{- $css := slice $fonts $split $style | resources.Concat "css/bundle.css" | resources.Minify | resources.Fingerprint -}}
+<link rel="preload" as="font" type="font/woff2" href="/fonts/montserrat-600-latin.woff2" crossorigin />
+<link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
 
-<!-- Styles -->
-<link rel="stylesheet" href="{{ "css/split.css" | relURL }}" type="text/css" media="screen" />
-{{ if .Site.Params.custom.css.enable }}
-<link rel="stylesheet" href="{{ "css/style.css" | relURL }}" type="text/css" media="screen" />
-{{ end }}
-
-<!-- Image Styles -->
+<!-- Image styles + LCP preload -->
 {{- if .Site.Params.visual.image.enable }}
   {{- with .Site.Params.visual.image.file }}
     {{- with resources.Get . }}
       {{- $bg := .Resize "1600x webp q82" }}
+      <link rel="preload" as="image" href="{{ $bg.RelPermalink }}" type="image/webp" fetchpriority="high" />
       <style>
         .fs-split .split-image { background-image: url("{{ $bg.RelPermalink }}"); background-position: {{ if $.Site.Params.visual.image.position }}{{ $.Site.Params.visual.image.position }}{{ else }}center center{{ end }}; }
       </style>
@@ -193,4 +182,3 @@
 {{ with .Site.Params.cloudflareBeaconToken }}
 <script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ . }}"}'></script>
 {{ end }}
-<!-- End Cloudflare Web Analytics -->

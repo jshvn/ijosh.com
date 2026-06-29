@@ -3,12 +3,13 @@ baseURL = "https://ijosh.com/"
 locale = "en-US"
 title = "Josh Vaughen"
 disableKinds = ["section", "taxonomy", "RSS"]
+enableGitInfo = true
 
 # Copyright
 copyright = "&copy;2024 Josh Vaughen"
 
 [sitemap]
-  changeFreq = 'always'
+  changeFreq = 'monthly'
   disable = false
   filename = 'sitemap.xml'
   priority = 0.8
