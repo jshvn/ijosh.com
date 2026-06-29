@@ -46,7 +46,7 @@ This page is meant to look **identical** across refactors. Rendered pixels are l
 Colors are **CSS custom properties** defined in `assets/css/style.css` `:root`; `split.css` references them via `var()`. To recolor the site, change the tokens — not scattered hexes.
 
 - **Tokens:** `--bg`, `--text` (name/tagline/pills), `--icon` (social icons), `--text-muted` (UI greys/links), `--text-body` (bio), `--accent` (link hover), `--pill-bg`.
-- **Dark mode** is automatic via `@media (prefers-color-scheme: dark)` overriding the tokens (content panel → brand navy `#061C30`). No toggle/JS. Light text/UI colors meet WCAG AA on their backgrounds — keep it that way if you change tokens.
+- **Dark mode** is automatic via `@media (prefers-color-scheme: dark)` overriding the tokens (content panel → neutral charcoal `#17191c`; `theme-color` is scheme-aware in `head.html`). The Connect button flips to a light pill (`--btn-bg`/`--btn-fg`) so the CTA stays visible. No toggle/JS. Light text/UI colors meet WCAG AA on their backgrounds — keep it that way if you change tokens.
 - **Fonts** — Montserrat (400/600, headings + body), Lora (serif, bio), Graduate, PT Serif. Self-hosted; latin + latin-ext subsets.
 - The name uses fluid `clamp(2.25rem, 5vw + 1rem, 3.375rem)` (caps at the prior 54px). Breakpoints: 1200 / 800 / 500px; at 800px the split layout stacks.
 - Entry uses `@starting-style` + an opacity transition (not a keyframe). A global `prefers-reduced-motion` guard neutralizes entry + hover motion.

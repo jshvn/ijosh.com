@@ -8,18 +8,22 @@
   --text-body: #4b5563;     /* bio reading text — ~7.5:1 */
   --accent: #ca486d;        /* link hover */
   --pill-bg: rgba(51, 51, 51, 0.1);
+  --btn-bg: #1c1c1c;        /* Connect button */
+  --btn-fg: #ffffff;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --bg: #061c30;          /* brand navy, matches theme-color */
+    --bg: #17191c;          /* neutral charcoal */
     --text: #f4f7fb;
     --icon: #f4f7fb;
-    --text-muted: #9aa7b4;  /* AA on navy */
+    --text-muted: #9aa7b4;  /* AA on dark grey */
     --text-body: #c6d0da;
     --accent: #e98aa3;      /* lighter pink for dark bg */
     --pill-bg: rgba(255, 255, 255, 0.1);
+    --btn-bg: #f4f7fb;      /* light button so the CTA pops on dark */
+    --btn-fg: #14171c;
   }
 }
 
@@ -67,9 +71,9 @@ body.page-template-page-fullsingle-split {
 }
 
 .button--rect--dark {
-  color: #FFF;
-  background-color: #1C1C1C;
-  border-color: #1C1C1C;
+  color: var(--btn-fg);
+  background-color: var(--btn-bg);
+  border-color: var(--btn-bg);
 }
 
 .button--rect--light {
@@ -108,7 +112,7 @@ section {
   justify-content: flex-start;
 }
 section.dark {
-  background-color: #000;
+  background-color: var(--btn-bg);
   margin-right: 15px;
 }
 section.dark-icons {
