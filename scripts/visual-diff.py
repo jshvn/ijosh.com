@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Golden-snapshot visual regression check for the site.
 
-The page is meant to look identical across refactors, so we lock the rendered
-pixels and fail the build if they drift unintentionally.
+Locks the rendered pixels (light + dark, desktop + mobile) to golden baselines
+and fails the build on unintended drift.
 
 Modes:
-  bless    screenshot the local build and save it as the golden baseline
-  check    screenshot the local build and diff it against the golden (exit 1 over threshold)
+  bless    capture the local build and save it as the golden baseline
+  check    capture the local build and diff against the golden (exit 1 over threshold)
   vs-live  diff the local content panel against a live URL (for matching a deploy)
 
-Screenshots use whatever Chrome/Chromium is already on the machine; diffing uses Pillow.
+Rendering uses Playwright driving the Chromium already on the machine; diffing uses Pillow.
 Run via the Taskfile (`task visual:check`) so the venv + build are set up for you.
 """
 import argparse
@@ -17,24 +17,25 @@ import functools
 import glob
 import http.server
 import os
-import subprocess
 import sys
 import threading
 from pathlib import Path
 
 try:
     from PIL import Image, ImageChops
-except ImportError:
-    sys.exit("Pillow missing — run `task visual:setup` (creates .venv-visual).")
+    from playwright.sync_api import sync_playwright
+except ImportError as exc:
+    sys.exit(f"missing dependency ({exc}) — run `task visual:setup`.")
 
 ROOT = Path.cwd()
 VIS = ROOT / "tests" / "visual"
 GOLD = VIS / "golden"
 OUT = VIS / "out"
 
-# Fixed viewports. Mobile is tall on purpose so the stacked content (below the
-# photo) is captured, not just the above-the-fold image.
-VIEWPORTS = {"desktop": (1440, 900), "mobile": (390, 2200)}
+# Viewports are the initial size; screenshots are full-page, so the tall stacked
+# mobile content (below the 80vh photo) is captured, not just the viewport.
+VIEWPORTS = {"desktop": (1440, 900), "mobile": (390, 844)}
+SCHEMES = ("light", "dark")
 
 
 def find_chrome() -> str:
@@ -70,21 +71,19 @@ def serve(directory: Path):
     return httpd, httpd.server_address[1]
 
 
-def shoot(chrome: str, url: str, path: Path, w: int, h: int) -> None:
+def shoot(browser, url: str, path: Path, w: int, h: int, scheme: str = "light") -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    # NB: do NOT pass --user-data-dir — a fresh profile deadlocks headless Chrome
-    # under --virtual-time-budget. virtual-time fast-forwards the body fade-in.
-    cmd = [chrome, "--headless=new", "--hide-scrollbars",
-           "--run-all-compositor-stages-before-draw", "--virtual-time-budget=8000",
-           "--force-device-scale-factor=1",
-           f"--window-size={w},{h}", f"--screenshot={path.resolve()}", url]
-    try:
-        subprocess.run(cmd, check=True, timeout=90,
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    except subprocess.TimeoutExpired:
-        sys.exit(f"screenshot timed out for {url} (>90s)")
-    if not path.exists():
-        sys.exit(f"screenshot not produced for {url}")
+    page = browser.new_page(
+        viewport={"width": w, "height": h},
+        device_scale_factor=1,
+        color_scheme=scheme,
+        reduced_motion="reduce",  # neutralizes the entry fade -> deterministic capture
+    )
+    # Analytics beacon is irrelevant to layout and can stall `load`; drop it.
+    page.route("**cloudflareinsights.com**", lambda route: route.abort())
+    page.goto(url, wait_until="load", timeout=30000)
+    page.screenshot(path=str(path.resolve()), full_page=True)
+    page.close()
 
 
 def _saturation(img):
@@ -121,56 +120,66 @@ def diff(ref: Path, cur: Path, out: Path, tol: int, sat: int = 40, crop=None):
 
 
 def cmd_bless(args):
-    chrome = find_chrome()
     httpd, port = serve(args.serve_dir)
     try:
-        for name, (w, h) in VIEWPORTS.items():
-            shoot(chrome, f"http://127.0.0.1:{port}/", GOLD / f"{name}.png", w, h)
-            print(f"blessed {name} -> {GOLD / (name + '.png')}")
+        with sync_playwright() as p:
+            browser = p.chromium.launch(executable_path=find_chrome())
+            for name, (w, h) in VIEWPORTS.items():
+                for scheme in SCHEMES:
+                    out = GOLD / f"{name}-{scheme}.png"
+                    shoot(browser, f"http://127.0.0.1:{port}/", out, w, h, scheme)
+                    print(f"blessed {name}-{scheme} -> {out}")
+            browser.close()
     finally:
         httpd.shutdown()
 
 
 def cmd_check(args):
-    chrome = find_chrome()
     httpd, port = serve(args.serve_dir)
     failed = False
     try:
-        for name, (w, h) in VIEWPORTS.items():
-            gold = GOLD / f"{name}.png"
-            if not gold.exists():
-                print(f"[FAIL] {name}: no golden — run `task visual:bless`")
-                failed = True
-                continue
-            local = OUT / f"{name}-local.png"
-            shoot(chrome, f"http://127.0.0.1:{port}/", local, w, h)
-            changed, total = diff(gold, local, OUT / f"{name}-diff.png", args.tol)
-            ratio = changed / total
-            ok = ratio <= args.threshold
-            failed = failed or not ok
-            print(f"[{'PASS' if ok else 'FAIL'}] {name}: {ratio * 100:.3f}% changed "
-                  f"({changed}/{total}px, tol={args.tol}) -> {OUT / (name + '-diff.png')}")
+        with sync_playwright() as p:
+            browser = p.chromium.launch(executable_path=find_chrome())
+            for name, (w, h) in VIEWPORTS.items():
+                for scheme in SCHEMES:
+                    tag = f"{name}-{scheme}"
+                    gold = GOLD / f"{tag}.png"
+                    if not gold.exists():
+                        print(f"[FAIL] {tag}: no golden — run `task visual:bless`")
+                        failed = True
+                        continue
+                    local = OUT / f"{tag}-local.png"
+                    shoot(browser, f"http://127.0.0.1:{port}/", local, w, h, scheme)
+                    changed, total = diff(gold, local, OUT / f"{tag}-diff.png", args.tol)
+                    ratio = changed / total
+                    ok = ratio <= args.threshold
+                    failed = failed or not ok
+                    print(f"[{'PASS' if ok else 'FAIL'}] {tag}: {ratio * 100:.3f}% changed "
+                          f"({changed}/{total}px, tol={args.tol}) -> {OUT / (tag + '-diff.png')}")
+            browser.close()
     finally:
         httpd.shutdown()
     sys.exit(1 if failed else 0)
 
 
 def cmd_vslive(args):
-    chrome = find_chrome()
     httpd, port = serve(args.serve_dir)
     ok = False
     try:
-        w, h = VIEWPORTS["desktop"]
-        local, ref = OUT / "vslive-local.png", OUT / "vslive-ref.png"
-        shoot(chrome, f"http://127.0.0.1:{port}/", local, w, h)
-        shoot(chrome, args.ref, ref, w, h)
-        # Right-hand content panel only: the photo uses a different image pipeline
-        # than live, so comparing it produces noise, not signal.
-        changed, total = diff(ref, local, OUT / "vslive-diff.png", args.tol, crop=(720, 0, w, h))
-        ratio = changed / total
-        ok = ratio <= args.threshold
-        print(f"[{'PASS' if ok else 'FAIL'}] content panel vs {args.ref}: "
-              f"{ratio * 100:.3f}% differ ({changed}/{total}px) -> {OUT / 'vslive-diff.png'}")
+        with sync_playwright() as p:
+            browser = p.chromium.launch(executable_path=find_chrome())
+            w, h = VIEWPORTS["desktop"]
+            local, ref = OUT / "vslive-local.png", OUT / "vslive-ref.png"
+            shoot(browser, f"http://127.0.0.1:{port}/", local, w, h, "light")
+            shoot(browser, args.ref, ref, w, h, "light")
+            # Right-hand content panel only: the photo uses a different image
+            # pipeline than live, so comparing it produces noise, not signal.
+            changed, total = diff(ref, local, OUT / "vslive-diff.png", args.tol, crop=(720, 0, w, h))
+            ratio = changed / total
+            ok = ratio <= args.threshold
+            print(f"[{'PASS' if ok else 'FAIL'}] content panel vs {args.ref}: "
+                  f"{ratio * 100:.3f}% differ ({changed}/{total}px) -> {OUT / 'vslive-diff.png'}")
+            browser.close()
     finally:
         httpd.shutdown()
     sys.exit(0 if ok else 1)
