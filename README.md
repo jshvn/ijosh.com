@@ -1,20 +1,58 @@
 # 👨🏻‍💻 ijosh.com
 
-This repository contains the contents of [ijosh.com](https://ijosh.com). It is a Hugo-based jamstack site that was migrated over from SquareSpace and deployed on Cloudflare Pages.
+This repository contains the contents of [ijosh.com](https://ijosh.com) — a Hugo-based
+jamstack site, migrated from SquareSpace and deployed on Cloudflare Pages.
 
 ***
 
 ## 🛠 Overview
 
-Whenever changes are pushed to the master branch they will automatically be picked up by Cloudflare and deployed live to the web. As such, development is suggested in any branch other than master before web deployment.
+Pushes to the `master` branch are picked up by Cloudflare and deployed live. Develop on a
+branch other than `master`, then merge when ready.
 
+The site is built to be **self-contained at runtime**: fonts and icons are served from this
+domain (no Google Fonts / CDN calls on page load), CSS is bundled + minified + fingerprinted,
+and security headers ship via `static/_headers`.
 
-## 👥 Social Icons
+## 💻 Development
 
-This blog post explains how to grab the icons for social and include them as links: [https://www.bigcatcreative.com/blog/social-links-navigation-squarespace](https://www.bigcatcreative.com/blog/social-links-navigation-squarespace).
+Requires [Hugo (extended)](https://gohugo.io/) and [go-task](https://taskfile.dev/).
 
-This website is where the icons are actually sourced from: [https://fontawesome.com/icons?d=gallery&m=free](https://fontawesome.com/icons?d=gallery&m=free)
+```sh
+task serve     # live-reloading dev server (hugo server -D -w)
+task build     # production build → public/  (hugo --minify --gc)
+task --list    # all tasks
+```
 
-## 👷🏻‍♂️ Theme Template
+> **Cloudflare Pages build command must be `hugo --minify --gc`.** Hugo only minifies the
+> HTML when that flag is set (CSS/fonts are already minified via the asset pipeline).
 
-The theme is adapted from this theme: [https://themes.gohugo.io/hugo-split-theme/](https://themes.gohugo.io/hugo-split-theme/) and merged with the color scheme and similar from the older Squarespace site. A license has been purchased such that the links to this theme can be removed.
+## 🎨 Assets
+
+- **Fonts** — self-hosted in `static/fonts/` (latin + latin-ext subsets) with `@font-face`
+  in `assets/css/fonts.css`. Regenerate from Google Fonts only if the font set changes.
+- **Icons** — the social/meta icons are inlined as SVG at build time from `assets/icons/`
+  (sourced from Font Awesome Free 6.x). No icon font / CDN is loaded.
+- **CSS** — `assets/css/{fonts,split,style}.css` are concatenated, minified, and fingerprinted
+  into one `/css/bundle.<hash>.css` in `layouts/partials/head.html`.
+
+## 🧪 Visual regression testing
+
+The page is meant to look identical across refactors, so the rendered pixels are locked to a
+golden baseline. First run creates a `.venv-visual/` (Pillow) and uses the machine's Chromium.
+
+```sh
+task visual:check     # fail if the build drifts from the golden baseline
+task visual:bless     # re-capture the baseline (run after an intended UI change)
+task visual:vs-live   # compare the local content panel against the live ijosh.com
+```
+
+Golden images live in `tests/visual/golden/` (committed). Diff artifacts land in
+`tests/visual/out/` (gitignored). **After any intentional visual change, re-run
+`task visual:bless` and commit the updated baseline.**
+
+## 👷🏻‍♂️ Theme
+
+Adapted from the [Hugo Split theme](https://themes.gohugo.io/hugo-split-theme/) and merged
+with the color scheme of the older Squarespace site. A license was purchased so the theme
+attribution links can be removed.
