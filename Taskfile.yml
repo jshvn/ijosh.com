@@ -29,13 +29,13 @@ tasks:
       - rm -f {{.GIT_DIR}}/.hugo_build*
 
   visual:setup:
-    desc: Create the visual-test virtualenv (Pillow)
+    desc: Create the visual-test virtualenv (Pillow + Playwright)
     internal: true
     cmds:
       - python3 -m venv .venv-visual
-      - ./.venv-visual/bin/pip install --quiet --upgrade pip Pillow
+      - ./.venv-visual/bin/pip install --quiet --upgrade pip Pillow playwright
     status:
-      - ./.venv-visual/bin/python -c "import PIL"
+      - ./.venv-visual/bin/python -c "import PIL, playwright"
 
   visual:bless:
     desc: Capture the current build as the golden visual baseline (re-run after intended UI changes)
