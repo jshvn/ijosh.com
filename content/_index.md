@@ -5,10 +5,10 @@ location = "Seattle"
 emojis = "🇺🇸🇬🇷🏳️‍🌈"
 +++
 
-I work in machine learning and value disciplined progress in how I train, think, and live.
+Hi, I’m Josh. I’ve learned to trust slow, compounding returns. The gym, a daily sit, the long arc of travel — none of them pay off fast, and that’s exactly why I keep at them.
 
-Over the last few years, I solo traveled across 60+ new countries, which helped me clarify my values and become very intentional about how I spend my time.
+So I build for it. I make AI-integrated systems for my own training — disciplined, repeatable ways to track lifestyle and gym progress, so the data compounds the same way the work does.
 
-Now I’m focused on what’s next: training hard, traveling often, and doing meaningful work in the machine learning space.
+Sixty-plus countries of solo travel taught me to spend time the way I’d invest it — deliberately, and for the long game.
 
-If you’d like to connect about machine learning, fitness, or travel, feel free to reach out by email or say hi on Instagram.
+I’m in Seattle and happy to connect. Building, fitness, travel — reach out by email or say hi on Instagram.
