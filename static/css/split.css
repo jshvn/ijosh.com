@@ -6,11 +6,7 @@ Template URI: https://onepagelove.com/split
 Description: Split is a centrally-divided layout for a professional online presence with a big image or video left with alongside content.
 */
 /* -- CSS Reset -- */
-@import url("https://fonts.googleapis.com/css?family=Montserrat:400,600");
-@import url("https://fonts.googleapis.com/css?family=Lora");
-@import url("https://fonts.googleapis.com/css?family=Graduate");
-@import url("https://fonts.googleapis.com/css2?family=PT+Serif");
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css");
+/* Fonts & Font Awesome are loaded via <link> in head.html (see "Fonts" block) */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,

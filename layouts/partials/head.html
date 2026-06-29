@@ -4,6 +4,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="theme-color" content="#061C30" />
 
+<!-- Performance: establish early connections to font/CDN origins -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+
 <!-- SEO -->
 <title>{{ if .IsPage }}{{ .Title }} - {{ end }}{{ .Site.Title }}</title>
 {{ with .Site.Params.author }}
@@ -57,10 +62,12 @@
 
 {{- with .Site.Params.shareImage }}
   {{- with resources.Get . }}
-    {{- $shareURL := .Permalink }}
+    {{- $card := .Fill "1200x630 smart jpg q85" }}
+    {{- $shareURL := $card.Permalink }}
     <meta property="og:image" content="{{ $shareURL }}" />
-    <meta property="og:image:width" content="{{ .Width }}"/>
-    <meta property="og:image:height" content="{{ .Height }}"/>
+    <meta property="og:image:width" content="{{ $card.Width }}"/>
+    <meta property="og:image:height" content="{{ $card.Height }}"/>
+    <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:alt" content="Josh Vaughen - Machine Learning Engineer" />
     <meta name="twitter:image" content="{{ $shareURL }}" />
     <meta name="twitter:image:alt" content="Josh Vaughen - Machine Learning Engineer" />
@@ -144,11 +151,6 @@
     "description": "Personal website of Josh Vaughen",
     "publisher": {
       "@id": "{{ .Site.BaseURL }}#person"
-    },
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "{{ .Site.BaseURL }}?s={search_term_string}",
-      "query-input": "required name=search_term_string"
     }
   }
 }
@@ -158,6 +160,11 @@
   <meta name="twitter:site" content="@{{ . }}" />
   <meta name="twitter:creator" content="@{{ . }}" />
 {{ end }}
+
+<!-- Fonts (moved out of split.css @import: discovered earlier, fetched in parallel, display=swap avoids invisible text) -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,600|Lora|Graduate&display=swap" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=PT+Serif&display=swap" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
 <!-- Styles -->
 <link rel="stylesheet" href="{{ "css/split.css" | relURL }}" type="text/css" media="screen" />
