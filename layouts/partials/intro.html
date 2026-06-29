@@ -4,7 +4,7 @@
   {{ if .Site.Params.showlocation.enable }}
     {{ with .Params.location }}
     <div class="location-wrapper">
-        <div class="fa-solid fa-location-dot" style="font-size: 16px;"></div>
+        <span class="split-meta-icon">{{ (resources.Get "icons/location-dot.svg").Content | safeHTML }}</span>
         <span class="location">{{ . }}</span>
     </div>
     {{ end }}
@@ -13,7 +13,7 @@
   {{ if .Site.Params.showemojis.enable }}
     {{ with .Params.emojis }}
     <div class="emojis-wrapper">
-        <div class="fa-solid fa-id-badge" style="font-size: 16px;"></div>
+        <span class="split-meta-icon">{{ (resources.Get "icons/id-badge.svg").Content | safeHTML }}</span>
         <span class="emojis">{{ . }}</span>
     </div>
     {{ end }}

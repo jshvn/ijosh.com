@@ -4,39 +4,48 @@ Personal one-page site for **ijosh.com** — a Hugo static site deployed on Clou
 
 ## Stack & deploy
 
-- **Hugo** static site generator. Config is `config.toml` (no theme dir — layouts and assets are vendored directly into the repo).
+- **Hugo (extended)** static site generator. Config is `config.toml` (no theme dir — layouts and assets are vendored directly into the repo).
 - **Cloudflare Pages** auto-deploys on push to `master`. There is no manual deploy step. Develop on any branch other than `master`; only merge/push to `master` when ready to go live.
 - Single page: `content/_index.md` (front matter + intro copy) rendered by `layouts/index.html`.
 
 ## Commands (Taskfile)
 
-- `task serve` — `hugo server -D -w` (drafts + watch). Aliases: `serve`, `serv`.
+- `task serve` — `hugo server -D -w` (drafts + watch).
+- `task build` — production build, `hugo --minify --gc`. **The Cloudflare Pages build command must match** (`--minify`), or HTML ships unminified.
+- `task visual:check` / `visual:bless` / `visual:vs-live` — see below.
 - `task clean` — remove `public/`, `resources/`, `.hugo_build*`.
-- `task` — list tasks.
+
+## ⚠️ Visual changes — verify, don't guess
+
+This page is meant to look **identical** across refactors. The rendered pixels are locked to a golden baseline in `tests/visual/golden/`.
+
+- **Never report a change to `layouts/` or `assets/css/` as done without running `task visual:check`.** It screenshots the build and fails on any drift. Reasoning about CSS is not verification — render it.
+- Matching an external reference (e.g. the live site): use `task visual:vs-live` and the pixel measurements. Do not eyeball-and-guess sizes/colors/spacing.
+- After an **intentional** visual change: run `task visual:bless`, then commit the updated golden PNGs.
 
 ## Layout structure
 
 - `layouts/_default/baseof.html` — base wrapper; partials compose the page.
-- `layouts/partials/head.html` — all SEO: meta tags, OpenGraph/Twitter cards, JSON-LD (Person + ProfilePage schema), favicon, analytics. **This is where most edits land** — keep the structured data in sync with `config.toml` params.
-- Other partials: `intro`, `bio`, `buttons` (social links), `links`, `footer`, `video`.
+- `layouts/partials/head.html` — all SEO (meta, OpenGraph/Twitter, JSON-LD Person + ProfilePage), favicon/manifest, the CSS bundle, font + LCP preloads, analytics. **Most edits land here** — keep structured data in sync with `config.toml` params.
+- Other partials: `intro`, `bio`, `buttons` (social links), `footer`.
 
-## Conventions
+## Architecture invariants (don't regress)
 
-- **CSS is plain CSS in `static/css/`** (`split.css` = vendored theme, `style.css` = custom overrides). There is no SCSS source in the repo — edit the compiled CSS directly. `style.css` only loads when `params.custom.css.enable = true`.
-- **Site config drives the templates.** Toggle features via `[params]` booleans in `config.toml` (`showemail`, `showgithub`, `showtwitter`, `showlocation`, `showemojis`, `visual.image`). Social URLs, author, description, share image all live there too — change config, not template literals.
-- Images live in `assets/images/` (processed via Hugo's `resources.Get`, e.g. profile + favicon) and `static/` (served as-is).
-- Theme is a purchased adaptation of [hugo-split-theme](https://themes.gohugo.io/hugo-split-theme/); attribution links may be removed per license.
+- **No third-party runtime assets.** Fonts are self-hosted (`static/fonts/`, `@font-face` in `assets/css/fonts.css`); social/meta icons are inlined SVG at build time from `assets/icons/` (Font Awesome Free 6.x source). Do **not** reintroduce Google Fonts or a Font Awesome CDN.
+- **CSS** = `assets/css/{fonts,split,style}.css` concatenated → minified → fingerprinted into one `/css/bundle.<hash>.css` in `head.html`. Add styles to `assets/css/style.css`; don't add new `<link>`s. (`split.css` = vendored theme, `style.css` = custom overrides.)
+- **Security headers / CSP** live in `static/_headers`. Adding an external origin (script/font/frame) requires updating the CSP or the browser blocks it.
+- **Site config drives templates.** Toggle features via `[params]` booleans in `config.toml` (`showemail`, `showgithub`, `showtwitter`, `showlocation`, `showemojis`, `visual.image`); social URLs, author, description, share image, and the Cloudflare beacon token live there too — change config, not template literals.
 
 ## Design tokens
 
-Baked into the compiled `static/css/split.css` (no SCSS source to read), kept here for intent — they match the prior SquareSpace design:
+Baked into `assets/css/split.css` (no SCSS source), kept here for intent — they match the prior SquareSpace design:
 
-- **Fonts** — loaded via `@import` at the top of `split.css`: Montserrat (400/600, headings + body), Lora (serif, bio content), plus Graduate and PT Serif. Font Awesome 6.5.2 via cdnjs CDN (also an `@import` there).
-- **Colors** — text/link `#848d96`, link-hover `#CA486d`, dark background `#061C30` (also the `theme-color` meta), name accent `#47bec7`.
-- **Breakpoints** — 1200 / 800 / 500px. At 800px the split-screen layout stacks vertically.
-- **Icon classes** — `fab` for brands (Instagram/LinkedIn/GitHub/X), `far`/`fa-solid` for the rest (e.g. `far fa-envelope`, `fa-solid fa-location-dot`).
+- **Fonts** — Montserrat (400/600, headings + body), Lora (serif, bio), Graduate, PT Serif. Self-hosted; subsets are latin + latin-ext.
+- **Colors** — text/link `#848d96`, link-hover `#CA486d`, dark background / `theme-color` `#061C30`, name accent `#47bec7`. Social icons render `#000`.
+- **Breakpoints** — 1200 / 800 / 500px. At 800px the split layout stacks vertically.
 
 ## Gotchas
 
-- JSON-LD in `head.html` has a couple of placeholder values (`alumniOf` "University (update if needed)", `worksFor` "Machine Learning") — fix if touching schema.
-- Analytics: Cloudflare beacon is hardcoded in `head.html`; Google Analytics only fires when configured and not on localhost.
+- `.button--rect` uses `font-family: "PT Sans"`, which is intentionally **not loaded** — it falls back to the browser default, matching the live site. Don't "fix" it to a loaded font without re-blessing the baseline.
+- Analytics: Cloudflare beacon fires only when `params.cloudflareBeaconToken` is set; Google Analytics only when configured and not on localhost.
+- Images: `assets/images/` (processed via `resources.Get`) vs `static/` (served as-is).

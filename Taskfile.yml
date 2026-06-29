@@ -16,9 +16,44 @@ tasks:
     cmds:
       - hugo server -D -w
 
+  build:
+    desc: Production build (minified, garbage-collected) — matches Cloudflare Pages
+    cmds:
+      - hugo --minify --gc
+
   clean:
     desc: Remove generated and auxiliary files
     cmds:
       - rm -rf {{.GIT_DIR}}/public/
       - rm -rf {{.GIT_DIR}}/resources/
       - rm -f {{.GIT_DIR}}/.hugo_build*
+
+  visual:setup:
+    desc: Create the visual-test virtualenv (Pillow)
+    internal: true
+    cmds:
+      - python3 -m venv .venv-visual
+      - ./.venv-visual/bin/pip install --quiet --upgrade pip Pillow
+    status:
+      - ./.venv-visual/bin/python -c "import PIL"
+
+  visual:bless:
+    desc: Capture the current build as the golden visual baseline (re-run after intended UI changes)
+    deps: [visual:setup]
+    cmds:
+      - hugo --minify --gc
+      - ./.venv-visual/bin/python scripts/visual-diff.py bless
+
+  visual:check:
+    desc: Fail if the current build drifts visually from the golden baseline
+    deps: [visual:setup]
+    cmds:
+      - hugo --minify --gc
+      - ./.venv-visual/bin/python scripts/visual-diff.py check
+
+  visual:vs-live:
+    desc: Compare the local content panel against the live site (ijosh.com)
+    deps: [visual:setup]
+    cmds:
+      - hugo --minify --gc
+      - ./.venv-visual/bin/python scripts/visual-diff.py vs-live
