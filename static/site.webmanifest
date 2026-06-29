@@ -1,11 +1,11 @@
 {
   "name": "Josh Vaughen",
   "short_name": "Josh Vaughen",
-  "description": "Josh Vaughen is a machine learning engineer with a fierce passion for solo travel and fitness.",
+  "description": "Josh Vaughen is a machine learning engineer in Seattle who builds AI-integrated training systems, lifts heavy, and has solo-traveled 60+ countries.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#061C30",
-  "theme_color": "#061C30",
+  "background_color": "#17191c",
+  "theme_color": "#17191c",
   "icons": [
     { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any maskable" }
   ]
