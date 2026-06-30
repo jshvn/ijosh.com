@@ -26,7 +26,14 @@ tasks:
     cmds:
       - rm -rf {{.GIT_DIR}}/public/
       - rm -rf {{.GIT_DIR}}/resources/
-      - rm -f {{.GIT_DIR}}/.hugo_build*
+      - rm -rf {{.GIT_DIR}}/tests/visual/out/
+      - rm -f {{.GIT_DIR}}/.hugo_build* {{.GIT_DIR}}/hugo_stats.json
+
+  clean:deep:
+    desc: Remove generated files plus the visual-test virtualenv (slow to rebuild)
+    deps: [clean]
+    cmds:
+      - rm -rf {{.GIT_DIR}}/.venv-visual/
 
   visual:setup:
     desc: Create the visual-test virtualenv (Pillow + Playwright)
