@@ -15,14 +15,20 @@
 {{ end }}
 <meta name="robots" content="index, follow" />
 
+<!-- Favicons, one declaration per format. SVG first so modern browsers take the vector;
+     .ico is the path Bing's crawler relies on; .png is what Google indexes. -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
 {{- with .Site.Params.favicon }}
   {{- with resources.Get . }}
-    <link rel="shortcut icon" href="{{ .RelPermalink }}" />
-    <link rel="icon" type="image/png" href="{{ .RelPermalink }}" />
-    <link rel="apple-touch-icon" href="{{ .RelPermalink }}" />
+    <link rel="shortcut icon" type="image/png" sizes="{{ .Width }}x{{ .Height }}" href="{{ .RelPermalink }}" />
   {{- end }}
 {{- end }}
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+{{- with .Site.Params.appleTouchIcon }}
+  {{- with resources.Get . }}
+    <link rel="apple-touch-icon" sizes="{{ .Width }}x{{ .Height }}" href="{{ .RelPermalink }}" />
+  {{- end }}
+{{- end }}
 <link rel="manifest" href="/site.webmanifest" />
 <link rel="canonical" href="{{ .Site.BaseURL }}"/>
 
