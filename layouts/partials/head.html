@@ -1,6 +1,5 @@
 {{- $img := resources.Get .Site.Params.shareImage -}}
 <meta charset="UTF-8" />
-<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
 <meta name="theme-color" content="#17191c" media="(prefers-color-scheme: dark)" />
@@ -13,7 +12,6 @@
 {{ with .Site.Params.description }}
   <meta name="description" content="{{ . }}" />
 {{ end }}
-<meta name="robots" content="index, follow" />
 
 <!-- Favicons, one declaration per format. SVG first so modern browsers take the vector;
      .ico is the path Bing's crawler relies on; .png is what Google indexes. -->
@@ -36,7 +34,6 @@
 {{ with .Site.Params.author }}
   <meta property="og:site_name" content="{{ . }}"/>
   <meta itemprop="name" content="{{ . }}"/>
-  <meta name="twitter:name" content="{{ . }}" />
 {{ end }}
 
 <meta property="og:title" content="{{ if .IsPage }}{{ .Title }} - {{ end }}{{ .Site.Title }}" />
@@ -47,16 +44,13 @@
 {{ end }}
 
 <meta property="og:url" content="{{ .Site.BaseURL }}" />
-<meta name="twitter:url" content="{{ .Site.BaseURL }}" />
 <meta itemprop="url" content="{{ .Site.BaseURL }}"/>
 <meta property="og:type" content="profile" />
 <meta property="profile:first_name" content="Josh" />
 <meta property="profile:last_name" content="Vaughen" />
 <meta property="profile:username" content="ijosh" />
 
-{{ with site.Language.Locale }}
-<meta property="og:locale" content="{{ . }}">
-{{ end }}
+<meta property="og:locale" content="en_US">
 
 {{- with .Site.Params.shareImage }}
   {{- with resources.Get . }}
@@ -66,9 +60,9 @@
     <meta property="og:image:width" content="{{ $card.Width }}"/>
     <meta property="og:image:height" content="{{ $card.Height }}"/>
     <meta property="og:image:type" content="image/jpeg" />
-    <meta property="og:image:alt" content="Josh Vaughen - Machine Learning Engineer" />
+    <meta property="og:image:alt" content="{{ $.Site.Params.author }} - {{ $.Site.Params.jobTitle }}" />
     <meta name="twitter:image" content="{{ $shareURL }}" />
-    <meta name="twitter:image:alt" content="Josh Vaughen - Machine Learning Engineer" />
+    <meta name="twitter:image:alt" content="{{ $.Site.Params.author }} - {{ $.Site.Params.jobTitle }}" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta itemprop="thumbnailUrl" content="{{ $shareURL }}"/>
     <link rel="image_src" href="{{ $shareURL }}" />
@@ -92,7 +86,7 @@
     "width": {{ $img.Width }},
     "height": {{ $img.Height }}
   },
-  "jobTitle": "Machine Learning Engineer",
+  "jobTitle": "{{ .Site.Params.jobTitle }}",
   "description": "{{ .Site.Params.description }}",
   "knowsAbout": [
     "Machine Learning",
@@ -122,7 +116,7 @@
   ],
   "hasOccupation": {
     "@type": "Occupation",
-    "name": "Machine Learning Engineer",
+    "name": "{{ .Site.Params.jobTitle }}",
     "occupationalCategory": "15-1299.09",
     "skills": "Machine Learning, Python, AI Systems, Health & Training Instrumentation"
   }
