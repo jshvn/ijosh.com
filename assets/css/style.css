@@ -105,21 +105,21 @@ body.page-template-page-fullsingle-split {
 
 html, body { height: 100%; }
 
-section {
+.button-container, .dark, .dark-icons {
   display: flex;
   width: 33%;
   min-height: 100%;
   justify-content: flex-start;
 }
-section.dark {
+.dark {
   background-color: var(--btn-bg);
   margin-right: 15px;
 }
-section.dark-icons {
+.dark-icons {
   justify-content: flex-end;
   align-items: center;
 }
-section.light {
+.light {
   background-color: #F2F2F2;
 }
 
