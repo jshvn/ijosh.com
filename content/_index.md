@@ -1,8 +1,7 @@
 +++
 title = "Josh Vaughen"
-tagline = "Engineer, Explorer, Trainer"
+roles = ["Engineer", "Explorer", "Trainer"]
 location = "Seattle"
-emojis = "🇺🇸🇬🇷🏳️‍🌈"
 +++
 
 Hi, I’m Josh. I’ve come to favor the slow things — the ones that compound quietly instead of paying off overnight. Lifting, daily meditation, the long arc of travel: none are fast, and that’s the point.

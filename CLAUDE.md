@@ -6,7 +6,7 @@ Personal one-page site for **ijosh.com** — a Hugo static site deployed on Clou
 
 - **Hugo (extended)** static site generator. Config is `hugo.toml` (no theme dir — layouts and assets are vendored directly into the repo).
 - **Cloudflare Pages** auto-deploys on push to `master`. There is no manual deploy step. Develop on any branch other than `master`; only merge/push to `master` when ready to go live.
-- Single page: `content/_index.md` (front matter + intro copy) rendered by `layouts/index.html`.
+- Single page: `content/_index.md` (front matter: `title`, `roles`, `location`; body = bio copy) rendered by `layouts/index.html`.
 
 ## Commands (Taskfile)
 
@@ -30,30 +30,31 @@ This page is meant to look **identical** across refactors. Rendered pixels are l
 
 ## Layout structure
 
-- `layouts/_default/baseof.html` — base wrapper; partials compose the page.
+- `layouts/_default/baseof.html` — base wrapper; the content panel is one CSS grid (`.bento`) and every partial emits tiles straight into it, so a partial must not wrap its tiles in an extra element.
 - `layouts/partials/head.html` — all SEO (meta, OpenGraph/Twitter, JSON-LD Person + ProfilePage), favicon/manifest, the CSS bundle, font + LCP preloads, analytics. **Most edits land here** — keep structured data in sync with `hugo.toml` params.
-- Other partials: `intro`, `bio`, `buttons` (social links), `footer`.
+- Other partials: `intro` (name tile, mark tile, one tile per role, place tile), `bio`, `buttons` (the social tile).
 
 ## Architecture invariants (don't regress)
 
-- **No third-party runtime assets.** Fonts are self-hosted (`static/fonts/`, `@font-face` in `assets/css/fonts.css`); social/meta icons are inlined SVG at build time from `assets/icons/` (Font Awesome Free 6.x source). Do **not** reintroduce Google Fonts or a Font Awesome CDN. The one cross-origin exception is `brand.ijosh.com` — self-owned, deployed from `jshvn/brand` — which serves the favicon set and is named under `img-src` in the CSP; keep it there.
+- **No third-party runtime assets.** Fonts are self-hosted (`static/fonts/`, `@font-face` in `assets/css/fonts.css`); social/meta icons are inlined SVG at build time from `assets/icons/` (Font Awesome Free 6.x source). Do **not** reintroduce Google Fonts or a Font Awesome CDN. The one cross-origin exception is `brand.ijosh.com` — self-owned, deployed from `jshvn/brand` — which serves the favicon set and the mark (`intro.html` loads `jshvn-mark-on-light.svg` / `-on-dark.svg` through a `<picture>`), and is named under `img-src` in the CSP; keep it there.
 - **CSS** = `assets/css/{fonts,split,style}.css` concatenated → minified → fingerprinted into one `/css/bundle.<hash>.css` in `head.html`. Add styles to `assets/css/style.css`; don't add new `<link>`s. (`split.css` = vendored theme, `style.css` = custom layer + tokens.)
 - **Security headers / CSP** live in `static/_headers`. Adding an external origin (script/font/frame) requires updating the CSP or the browser blocks it.
-- **Site config drives templates.** Toggle features via `[params]` booleans in `hugo.toml` (`showemail`, `showgithub`, `showtwitter`, `showlocation`, `showemojis`, `visual.image`); social URLs, author, description, share image, and the Cloudflare beacon token live there too — change config, not template literals.
+- **Site config drives templates.** Toggle features via `[params]` booleans in `hugo.toml` (`showemail`, `showgithub`, `showtwitter`, `showlocation`, `visual.image`); social URLs, author, description, share image, and the Cloudflare beacon token live there too — change config, not template literals.
 
 ## Theming (design tokens + dark mode)
 
 Colors are **CSS custom properties** defined in `assets/css/style.css` `:root`; `split.css` references them via `var()`. To recolor the site, change the tokens — not scattered hexes.
 
-- **Tokens:** `--bg`, `--text` (name/tagline/pills), `--icon` (social icons), `--text-muted` (UI greys/links), `--text-body` (bio), `--accent` (link hover), `--pill-bg`.
-- **Dark mode** is automatic via `@media (prefers-color-scheme: dark)` overriding the tokens (content panel → neutral charcoal `#17191c`; `theme-color` is scheme-aware in `head.html`). The Connect button flips to a light pill (`--btn-bg`/`--btn-fg`) so the CTA stays visible. No toggle/JS. Light text/UI colors meet WCAG AA on their backgrounds — keep it that way if you change tokens.
+- **Tokens:** `--bg`, `--text` (name, role/place tiles), `--icon` (social icons, place pin), `--text-muted` (UI greys/links), `--text-body` (bio), `--accent` (link hover), `--tile-bg` (every tile's fill, including the mark's).
+- **Dark mode** is automatic via `@media (prefers-color-scheme: dark)` overriding the tokens (content panel → neutral charcoal `#17191c`; `theme-color` is scheme-aware in `head.html`). The mark swaps to its on-dark file via `<picture>`. No toggle/JS. Light text/UI colors meet WCAG AA on their backgrounds — keep it that way if you change tokens.
 - **Fonts** — Montserrat (400/600, headings + body), Lora (serif, bio), Graduate, PT Serif. Self-hosted; latin + latin-ext subsets.
-- The name uses fluid `clamp(2.25rem, 5vw + 1rem, 3.375rem)` (caps at the prior 54px). Breakpoints: 1200 / 800 / 500px; at 800px the split layout stacks.
+- **Bento sizing** follows the mark's grid (20-unit cell, 4-unit gap, rx 4): a 64px row unit, 8px gap, 16px radius on wide columns; 72 / 8 / 14 on narrow ones. Tiles: name (full width), mark (2×2), one per role (2×1), place (2×1), bio (full width, no fill), socials (full width).
+- The column count comes from a **container query** on `.split-content-vertically-center`, not the viewport: 6 columns from 409px of column width, 4 below. 409px is the narrowest column where a two-column word tile still holds ENGINEER. Viewport breakpoints stay 1200 / 800 / 500px; at 800px the split layout stacks.
+- The name is one line, sized to its tile with container units: `clamp(30px, 11.6cqw, 54px)`, untracked. 11.6cqw fits "JOSH VAUGHEN" (8.36em in Montserrat 600) with 3% slack; a longer name needs a smaller factor.
 - Entry uses `@starting-style` + an opacity transition (not a keyframe). A global `prefers-reduced-motion` guard neutralizes entry + hover motion.
 
 ## Gotchas
 
-- `.button--rect` uses `font-family: "PT Sans"`, which is intentionally **not loaded** — it falls back to the browser default, matching the live site. Don't "fix" it to a loaded font without re-blessing the baseline.
 - Analytics: Cloudflare beacon fires only when `params.cloudflareBeaconToken` is set; Google Analytics only when configured and not on localhost.
 - Images: `assets/images/` (processed via `resources.Get`) vs `static/` (served as-is).
 - Favicons: the SVG, Apple touch, mask and manifest icons load from `https://brand.ijosh.com/mark/`. `static/favicon.ico` is the one local copy — browsers probe it on this origin, and Google reads ICO but not SVG — so `task check:favicon` fails when it drifts from brand. Keep `/favicon.ico` first in the `<link>` order.

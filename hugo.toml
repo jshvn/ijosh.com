@@ -50,9 +50,6 @@ copyright = "&copy;2024 Josh Vaughen"
   [params.showlocation]
     enable = true
 
-  [params.showemojis]
-    enable = true
-
   # Section - Visual
   [params.visual]
 
