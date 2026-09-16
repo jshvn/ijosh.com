@@ -135,7 +135,7 @@ html, body { height: 100%; }
 
 .tile--bio {
   display: block;
-  padding: 12px 0;
+  padding: 32px 0;                        /* 40px to the tiles above and below, with the gap */
   border-radius: 0;
   background: none;
 }
