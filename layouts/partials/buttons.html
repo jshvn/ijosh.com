@@ -1,24 +1,13 @@
-<nav class="button-container" aria-label="Social links">
-    <div class="dark" id="connectbuttoncontainer">
-        <a class="button button--rect button--rect--dark" rel="me noopener" target="_blank" aria-label="Connect with {{ .Site.Params.firstName }} on Instagram (opens in new tab)" title="Instagram" id="connectbutton" href="{{ .Site.Params.social.instagram }}">Connect</a>
-    </div>
-    <div class="dark-icons">
-        <span class="spacer"></span>
-        <a rel="me noopener" target="_blank" aria-label="Instagram (opens in new tab)" title="Instagram" class="button social-icon" href="{{ .Site.Params.social.instagram }}">{{ (resources.Get "icons/instagram.svg").Content | safeHTML }}</a>
-        <span class="spacer"></span>
-        <a rel="me noopener" target="_blank" aria-label="LinkedIn (opens in new tab)" title="LinkedIn" class="button social-icon" href="{{ .Site.Params.social.linkedin }}">{{ (resources.Get "icons/linkedin-in.svg").Content | safeHTML }}</a>
-        <span class="spacer"></span>
-        {{ if .Site.Params.showgithub.enable }}
-        <a rel="me noopener" target="_blank" aria-label="GitHub (opens in new tab)" title="GitHub" class="button social-icon" href="{{ .Site.Params.social.github }}">{{ (resources.Get "icons/github.svg").Content | safeHTML }}</a>
-        <span class="spacer"></span>
-        {{ end }}
-        {{ if .Site.Params.showtwitter.enable }}
-        <a rel="me noopener" target="_blank" aria-label="X (opens in new tab)" title="X" class="button social-icon" href="{{ .Site.Params.social.twitter }}">{{ (resources.Get "icons/x-twitter.svg").Content | safeHTML }}</a>
-        <span class="spacer"></span>
-        {{ end }}
-        {{ if .Site.Params.showemail.enable }}
-        <a rel="me" aria-label="Email {{ .Site.Params.firstName }}" title="Email" class="button social-icon" href="mailto:{{ .Site.Params.social.email }}">{{ (resources.Get "icons/envelope.svg").Content | safeHTML }}</a>
-        <span class="spacer"></span>
-        {{ end }}
-    </div>
+<nav class="tile tile--social" aria-label="Social links">
+    <a rel="me noopener" target="_blank" aria-label="Instagram (opens in new tab)" title="Instagram" class="social-icon" href="{{ .Site.Params.social.instagram }}">{{ (resources.Get "icons/instagram.svg").Content | safeHTML }}</a>
+    <a rel="me noopener" target="_blank" aria-label="LinkedIn (opens in new tab)" title="LinkedIn" class="social-icon" href="{{ .Site.Params.social.linkedin }}">{{ (resources.Get "icons/linkedin-in.svg").Content | safeHTML }}</a>
+    {{ if .Site.Params.showgithub.enable }}
+    <a rel="me noopener" target="_blank" aria-label="GitHub (opens in new tab)" title="GitHub" class="social-icon" href="{{ .Site.Params.social.github }}">{{ (resources.Get "icons/github.svg").Content | safeHTML }}</a>
+    {{ end }}
+    {{ if .Site.Params.showtwitter.enable }}
+    <a rel="me noopener" target="_blank" aria-label="X (opens in new tab)" title="X" class="social-icon" href="{{ .Site.Params.social.twitter }}">{{ (resources.Get "icons/x-twitter.svg").Content | safeHTML }}</a>
+    {{ end }}
+    {{ if .Site.Params.showemail.enable }}
+    <a rel="me" aria-label="Email {{ .Site.Params.firstName }}" title="Email" class="social-icon" href="mailto:{{ .Site.Params.social.email }}">{{ (resources.Get "icons/envelope.svg").Content | safeHTML }}</a>
+    {{ end }}
 </nav>

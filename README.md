@@ -11,7 +11,7 @@ Pushes to the `master` branch are picked up by Cloudflare and deployed live. Dev
 branch other than `master`, then merge when ready.
 
 The site is built to be **self-contained at runtime**: fonts and social icons are served
-from this domain (no Google Fonts / CDN calls on page load), favicons from
+from this domain (no Google Fonts / CDN calls on page load), favicons and the mark from
 [brand.ijosh.com](https://brand.ijosh.com) (also ours, from `jshvn/brand`), CSS is bundled +
 minified + fingerprinted, and security headers ship via `static/_headers`.
 
