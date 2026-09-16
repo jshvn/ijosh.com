@@ -13,20 +13,15 @@
   <meta name="description" content="{{ . }}" />
 {{ end }}
 
-<!-- Favicons, one declaration per format. SVG first so modern browsers take the vector;
-     .ico is the path Bing's crawler relies on; .png is what Google indexes. -->
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<!-- Favicons. The ICO stays on this origin: browsers probe /favicon.ico here whatever the
+     tags say, and Google reads ICO but not SVG, so it is the likeliest icon beside this
+     site in a search result. Everything else loads from brand.ijosh.com (jshvn/brand),
+     which the CSP names under img-src. Keep the ICO first: Google documents no
+     precedence between it and the PNG. -->
 <link rel="icon" href="/favicon.ico" sizes="16x16 32x32 48x48" />
-{{- with .Site.Params.favicon }}
-  {{- with resources.Get . }}
-    <link rel="shortcut icon" type="image/png" sizes="{{ .Width }}x{{ .Height }}" href="{{ .RelPermalink }}" />
-  {{- end }}
-{{- end }}
-{{- with .Site.Params.appleTouchIcon }}
-  {{- with resources.Get . }}
-    <link rel="apple-touch-icon" sizes="{{ .Width }}x{{ .Height }}" href="{{ .RelPermalink }}" />
-  {{- end }}
-{{- end }}
+<link rel="icon" href="https://brand.ijosh.com/mark/jshvn-icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="https://brand.ijosh.com/mark/apple-touch-icon-180.png" />
+<link rel="mask-icon" href="https://brand.ijosh.com/mark/safari-pinned-tab.svg" color="#ca486d" />
 <link rel="manifest" href="/site.webmanifest" />
 <link rel="canonical" href="{{ .Site.BaseURL }}"/>
 

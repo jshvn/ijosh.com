@@ -7,7 +7,8 @@
   "background_color": "#17191c",
   "theme_color": "#17191c",
   "icons": [
-    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
-    { "src": "/images/favicon-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" }
+    { "src": "https://brand.ijosh.com/mark/jshvn-icon-maskable-192.png", "type": "image/png", "sizes": "192x192", "purpose": "maskable" },
+    { "src": "https://brand.ijosh.com/mark/jshvn-icon-maskable-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" },
+    { "src": "https://brand.ijosh.com/mark/jshvn-icon-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" }
   ]
 }
