@@ -39,7 +39,7 @@ This page is meant to look **identical** across refactors. Rendered pixels are l
 - **No third-party runtime assets.** Fonts are self-hosted (`static/fonts/`, `@font-face` in `assets/css/fonts.css`); social/meta icons are inlined SVG at build time from `assets/icons/` (Font Awesome Free 6.x source). Do **not** reintroduce Google Fonts or a Font Awesome CDN. The one cross-origin exception is `brand.ijosh.com` — self-owned, deployed from `jshvn/brand` — which serves the favicon set and the mark (`intro.html` loads `jshvn-mark-on-light.svg` / `-on-dark.svg` through a `<picture>`), and is named under `img-src` in the CSP; keep it there.
 - **CSS** = `assets/css/{fonts,split,style}.css` concatenated → minified → fingerprinted into one `/css/bundle.<hash>.css` in `head.html`. Add styles to `assets/css/style.css`; don't add new `<link>`s. (`split.css` = vendored theme, `style.css` = custom layer + tokens.)
 - **Security headers / CSP** live in `static/_headers`. Adding an external origin (script/font/frame) requires updating the CSP or the browser blocks it.
-- **Site config drives templates.** Toggle features via `[params]` booleans in `hugo.toml` (`showemail`, `showgithub`, `showtwitter`, `showlocation`, `visual.image`); social URLs, author, description, share image, and the Cloudflare beacon token live there too — change config, not template literals.
+- **Site config drives templates.** Toggle features via `[params]` booleans in `hugo.toml` (`showemail`, `showgithub`, `showtwitter`, `showlocation`, `visual.image`); social URLs, author, description, and share image live there too — change config, not template literals.
 
 ## Theming (design tokens + dark mode)
 
@@ -55,6 +55,9 @@ Colors are **CSS custom properties** defined in `assets/css/style.css` `:root`; 
 
 ## Gotchas
 
-- Analytics: Cloudflare beacon fires only when `params.cloudflareBeaconToken` is set; Google Analytics only when configured and not on localhost.
+- Analytics: Cloudflare Web Analytics is enabled per-zone in the Cloudflare dashboard, which injects the beacon
+  into the HTML itself. The templates emit no beacon — that is why `script-src`/`connect-src` in `static/_headers`
+  name the `cloudflareinsights.com` origins the injected script needs. Google Analytics fires only when configured
+  and not on localhost.
 - Images: `assets/images/` (processed via `resources.Get`) vs `static/` (served as-is).
 - Favicons: the SVG, Apple touch, mask and manifest icons load from `https://brand.ijosh.com/mark/`. `static/favicon.ico` is the one local copy — browsers probe it on this origin, and Google reads ICO but not SVG — so `task check:favicon` fails when it drifts from brand. Keep `/favicon.ico` first in the `<link>` order.

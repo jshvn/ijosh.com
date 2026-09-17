@@ -172,8 +172,3 @@
 {{ if and (.Site.Config.Services.GoogleAnalytics.ID) (not (in (printf "%#v" .Site.BaseURL) "localhost")) }}
   {{ template "_internal/google_analytics.html" . }}
 {{ end }}
-
-<!-- Cloudflare Web Analytics -->
-{{ with .Site.Params.cloudflareBeaconToken }}
-<script defer src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "{{ . }}"}'></script>
-{{ end }}

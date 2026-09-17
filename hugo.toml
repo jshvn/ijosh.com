@@ -24,9 +24,6 @@ copyright = "&copy;2024 Josh Vaughen"
   shareImage = "images/profile.webp"
   twitterHandle = "dvnll"
 
-  # Cloudflare Web Analytics beacon token (public; omit to disable the beacon)
-  cloudflareBeaconToken = "8ec666be52124450bc6694216a8ef6ba"
-
   # Social Links
   [params.social]
     email = "josh@vaughen.net"
