@@ -121,28 +121,21 @@ h1, p, ul { margin: 0; padding: 0; }
   white-space: nowrap;
 }
 
-/* Roles on one line, a small square between each. Where the line would wrap, they stack. */
+/* Roles as chips under the name. The words stay at the label's 14px; the chip is kept
+   small around them, and the chips wrap where one line won't hold all three. */
 .roles {
   list-style: none;
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 .roles li {
-  display: flex;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: var(--pill-bg);
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-}
-.roles li + li::before {
-  content: "";
-  width: 6px;
-  height: 6px;
-  border-radius: 1.2px;
-  background: var(--text-muted);
-}
-@container (max-width: 400px) {
-  .roles { flex-direction: column; align-items: flex-start; }
-  .roles li + li::before { display: none; }
 }
 
 /* 19cqw keeps VAUGHEN (5.1em) inside the narrowest phone card; the name wraps to two

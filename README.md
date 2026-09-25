@@ -61,6 +61,6 @@ Golden images live in `tests/visual/golden/` (committed). Diff artifacts land in
 ## 👷🏻‍♂️ Design
 
 One card on the `jshvn/brand` grid field: the photo on the left with the place pinned to it,
-then the roles, the name, the bio, and a footer with the social links and the mark. On
+then the name, the roles as chips, the bio, and a footer with the social links and the mark. On
 narrow screens the card stacks, photo on top. Colors, type and the mark follow
 [brand.ijosh.com](https://brand.ijosh.com).

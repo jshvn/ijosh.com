@@ -1,6 +1,6 @@
+<h1>{{ .Title }}</h1>
 <ul class="roles" aria-label="Roles">
   {{- range .Params.roles }}
-  <li class="label">{{ . }}</li>
+  <li><span class="label">{{ . }}</span></li>
   {{- end }}
 </ul>
-<h1>{{ .Title }}</h1>

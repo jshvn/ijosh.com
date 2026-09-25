@@ -33,7 +33,7 @@ This page is meant to look **identical** across refactors. Rendered pixels are l
 - `layouts/_default/baseof.html` — base wrapper: `.field` (the grid background) holds `.hole` (a square in the page color) holding `.card`. Every page fills the card through the `main` block.
 - `layouts/index.html` — the card's contents: the `photo` partial, then `.body` with `intro`, `bio` and `buttons`.
 - `layouts/partials/head.html` — all SEO (meta, OpenGraph/Twitter, JSON-LD Person + ProfilePage), favicon/manifest, the CSS bundle, font + LCP preloads, analytics. **Most edits land here** — keep structured data in sync with `hugo.toml` params.
-- Other partials: `photo` (the photo and the place chip), `intro` (roles list and name), `bio`, `buttons` (the footer: social links and the mark).
+- Other partials: `photo` (the photo and the place chip), `intro` (the name and the role chips), `bio`, `buttons` (the footer: social links and the mark).
 
 ## Architecture invariants (don't regress)
 
@@ -51,7 +51,7 @@ Colors and type come from `assets/css/tokens.css`, the brand's own file: `--bg`,
 - **The field** is `static/images/field-{light,dark}.svg`, a 24 × 24 cell tile from `scripts/field.mjs` using the brand banners' position hash. `task field` rewrites it; `task check:field` fails on drift.
 - **The lattice** is the mark's grid: 20px cells on a 24px pitch below 1100px, doubled to 40 / 48 above. The field is positioned at the card's top-left corner, and the card's size is a cell plus whole pitches, so its edges land between cells. The card is centred with an equal margin above and below (`--top`). Wide: 1000 × 568, photo pane 400px. Narrow: as wide as the screen allows in whole pitches (up to 596px), and as tall as the screen less the margins (`--fill-h`), with the photo taking the height the words don't; CSS rounds both. When the words are taller than the screen (a phone), `assets/js/lattice.js`, the page's one script, rounds the card's height into `--card-h`; without it that card can cut the row under it.
 - `.hole` is a square in the page color behind the rounded card, so the card's corners show the page, not part of a cell.
-- The name is sized `min(56px, 19cqw)` against the text column: one line on the wide card and from about 480px of column, two lines on a phone. Roles sit on one line and stack under 400px of column.
+- The name is sized `min(56px, 19cqw)` against the text column: one line on the wide card and from about 480px of column, two lines on a phone. The roles are chips under it: 14px labels in 28px chips, wrapping where one line won't hold all three.
 - Entry uses `@starting-style` + an opacity transition (not a keyframe). A global `prefers-reduced-motion` guard neutralizes entry + hover motion.
 
 ## Gotchas
