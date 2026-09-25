@@ -5,38 +5,13 @@
   {{ partial "head" . }}
 </head>
 
-<body id="fullsingle" class="page-template-page-fullsingle-split">
-
-  <div class="fs-split">
-
-    <!-- Image -->
-    {{ if .Site.Params.visual.image.enable }}
-
-      <div class="split-image" role="img" aria-label="{{ .Site.Params.author }}">
-
-      </div>
-
-    <!-- Video -->
-    {{ else if .Site.Params.visual.video.enable }}
-
-      {{ partial "video" . }}
-
-    {{ end }}
-
-    <!-- Content Side: every partial emits tiles straight into the one grid -->
-    <main class="split-content">
-      <div class="split-content-vertically-center">
-        <div class="bento">
-          {{ partial "intro" . }}
-
-          {{ block "main" .  }}
-            {{ partial "bio" . }}
-          {{ end }}
-        </div>
-      </div>
-    </main>
-
-  </div>
-
+<body>
+  <main class="field">
+    <div class="hole">
+      <article class="card">
+        {{ block "main" . }}{{ end }}
+      </article>
+    </div>
+  </main>
 </body>
 </html>

@@ -1,0 +1,8 @@
+{{- with .Site.Params.visual.image }}{{ if .enable }}
+<div class="photo">
+  <img src="{{ .file }}" alt="{{ $.Site.Params.author }}" style="object-position: {{ .position | default "center" }}" fetchpriority="high" />
+  {{- if $.Site.Params.showlocation.enable }}{{ with $.Params.location }}
+  <span class="chip">{{ (resources.Get "icons/location-dot.svg").Content | safeHTML }}<span class="label">{{ . }}</span></span>
+  {{- end }}{{ end }}
+</div>
+{{- end }}{{ end }}

@@ -4,7 +4,7 @@
   "description": "Josh Vaughen is a machine learning engineer in Seattle who builds AI-integrated training systems, lifts heavy, and has solo-traveled 60+ countries.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#17191c",
+  "background_color": "#ffffff",
   "theme_color": "#17191c",
   "icons": [
     { "src": "https://brand.ijosh.com/mark/jshvn-icon-maskable-192.png", "type": "image/png", "sizes": "192x192", "purpose": "maskable" },

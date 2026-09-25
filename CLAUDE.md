@@ -18,7 +18,7 @@ Personal one-page site for **ijosh.com** — a Hugo static site deployed on Clou
 ### Cloudflare Pages settings (one-time, in the dashboard — not in repo)
 
 - **Build command:** `hugo --minify --gc` (Hugo only minifies HTML with `--minify`; CSS/fonts are minified by the asset pipeline regardless).
-- **`HUGO_VERSION` env var:** pin to the tested **extended** version (currently `0.163.3`). Extended is required for WebP image processing.
+- **`HUGO_VERSION` env var:** pin to the tested **extended** version (currently `0.163.3`).
 
 ## ⚠️ Visual changes — verify, don't guess
 
@@ -30,27 +30,28 @@ This page is meant to look **identical** across refactors. Rendered pixels are l
 
 ## Layout structure
 
-- `layouts/_default/baseof.html` — base wrapper; the content panel is one CSS grid (`.bento`) and every partial emits tiles straight into it, so a partial must not wrap its tiles in an extra element.
+- `layouts/_default/baseof.html` — base wrapper: `.field` (the grid background) holds `.hole` (a square in the page color) holding `.card`. Every page fills the card through the `main` block.
+- `layouts/index.html` — the card's contents: the `photo` partial, then `.body` with `intro`, `bio` and `buttons`.
 - `layouts/partials/head.html` — all SEO (meta, OpenGraph/Twitter, JSON-LD Person + ProfilePage), favicon/manifest, the CSS bundle, font + LCP preloads, analytics. **Most edits land here** — keep structured data in sync with `hugo.toml` params.
-- Other partials: `intro` (name tile, mark tile, one tile per role, place tile), `bio`, `buttons` (the social tile).
+- Other partials: `photo` (the photo and the place chip), `intro` (the name and the role chips), `bio`, `buttons` (the footer: social links and the mark).
 
 ## Architecture invariants (don't regress)
 
-- **No third-party runtime assets.** Fonts are self-hosted (`static/fonts/`, `@font-face` in `assets/css/fonts.css`); social/meta icons are inlined SVG at build time from `assets/icons/` (Font Awesome Free 6.x source). Do **not** reintroduce Google Fonts or a Font Awesome CDN. The one cross-origin exception is `brand.ijosh.com` — self-owned, deployed from `jshvn/brand` — which serves the favicon set and the mark (`intro.html` loads `jshvn-mark-on-light.svg` / `-on-dark.svg` through a `<picture>`), and is named under `img-src` in the CSP; keep it there.
-- **CSS** = `assets/css/{fonts,split,style}.css` concatenated → minified → fingerprinted into one `/css/bundle.<hash>.css` in `head.html`. Add styles to `assets/css/style.css`; don't add new `<link>`s. (`split.css` = vendored theme, `style.css` = custom layer + tokens.)
+- **No third-party runtime assets.** Fonts are self-hosted (`static/fonts/`, `@font-face` in `assets/css/tokens.css`); social/meta icons are inlined SVG at build time from `assets/icons/` (Font Awesome Free 6.x source). Do **not** reintroduce Google Fonts or a Font Awesome CDN. The one cross-origin exception is `brand.ijosh.com` — self-owned, deployed from `jshvn/brand` — which serves the favicon set, the photo, and the mark (`buttons.html` loads `jshvn-mark-on-light.svg` / `-on-dark.svg` through a `<picture>`), and is named under `img-src` in the CSP; keep it there.
+- **CSS** = `assets/css/{tokens,style}.css` concatenated → minified → fingerprinted into one `/css/bundle.<hash>.css` in `head.html`. Add styles to `assets/css/style.css`; don't add new `<link>`s. `tokens.css` is a copy of `https://brand.ijosh.com/tokens.css` — never edit it here.
 - **Security headers / CSP** live in `static/_headers`. Adding an external origin (script/font/frame) requires updating the CSP or the browser blocks it.
-- **Site config drives templates.** Toggle features via `[params]` booleans in `hugo.toml` (`showemail`, `showgithub`, `showtwitter`, `showlocation`, `visual.image`); social URLs, author, description, and share image live there too — change config, not template literals.
+- **Site config drives templates.** Toggle features via `[params]` booleans in `hugo.toml` (`showemail`, `showgithub`, `showtwitter`, `showlocation`, `visual.image`); social URLs, author, description, the photo, and the share image live there too — change config, not template literals.
 
 ## Theming (design tokens + dark mode)
 
-Colors are **CSS custom properties** defined in `assets/css/style.css` `:root`; `split.css` references them via `var()`. To recolor the site, change the tokens — not scattered hexes.
+Colors and type come from `assets/css/tokens.css`, the brand's own file: `--bg`, `--text`, `--text-body`, `--text-muted`, `--icon`, `--accent`, `--pill-bg`, `--mark`, `--mark-muted`, and the `--font-*` roles. To change one, change it in `jshvn/brand`, copy the file over, and `task check:brand` confirms the copy.
 
-- **Tokens:** `--bg`, `--text` (name, role/place tiles), `--icon` (social icons, place pin), `--text-muted` (UI greys/links), `--text-body` (bio), `--accent` (link hover), `--tile-bg` (every tile's fill, including the mark's).
-- **Dark mode** is automatic via `@media (prefers-color-scheme: dark)` overriding the tokens (content panel → neutral charcoal `#17191c`; `theme-color` is scheme-aware in `head.html`). The mark swaps to its on-dark file via `<picture>`. No toggle/JS. Light text/UI colors meet WCAG AA on their backgrounds — keep it that way if you change tokens.
-- **Fonts** — Montserrat (400/600, headings + body), Lora (serif, bio), Graduate, PT Serif. Self-hosted; latin + latin-ext subsets.
-- **Bento sizing** follows the mark's grid (20-unit cell, 4-unit gap, rx 4): a 64px row unit, 8px gap, 16px radius on wide columns; 72 / 8 / 14 on narrow ones. Tiles: name (full width), mark (2×2), one per role (2×1), place (2×1), bio (full width, no fill), socials (full width).
-- The column count comes from a **container query** on `.split-content-vertically-center`, not the viewport: 6 columns from 409px of column width, 4 below. 409px is the narrowest column where a two-column word tile still holds ENGINEER. Viewport breakpoints stay 1200 / 800 / 500px; at 800px the split layout stacks.
-- The name is one line, sized to its tile with container units: `clamp(30px, 11.6cqw, 54px)`, untracked. 11.6cqw fits "JOSH VAUGHEN" (8.36em in Montserrat 600) with 3% slack; a longer name needs a smaller factor.
+- **Dark mode** is automatic via `prefers-color-scheme`, from the dark block in `tokens.css`; `style.css` swaps only the field image (`--field`). `theme-color` is scheme-aware in `head.html`; the mark swaps to its on-dark file via `<picture>`. No toggle.
+- **Fonts** — Montserrat 600 (the name), Graduate 400 (roles, place), PT Serif 400 (bio). `font-synthesis: none`, so nothing is faked bold or italic.
+- **The field** is `static/images/field-{light,dark}.svg`, a 24 × 24 cell tile from `scripts/field.mjs` using the brand banners' position hash. `task field` rewrites it; `task check:field` fails on drift.
+- **The lattice** is the mark's grid: 20px cells on a 24px pitch below 1100px, doubled to 40 / 48 above. The field is positioned at the card's top-left corner, and the card's size is a cell plus whole pitches, so its edges land between cells. The card is centred with an equal margin above and below (`--top`). Wide: 1000 × 568, photo pane 400px. Narrow: as wide as the screen allows in whole pitches (up to 596px), and as tall as the screen less the margins (`--fill-h`), with the photo taking the height the words don't; CSS rounds both. When the words are taller than the screen (a phone), `assets/js/lattice.js`, the page's one script, rounds the card's height into `--card-h`; without it that card can cut the row under it.
+- `.hole` is a square in the page color behind the rounded card, so the card's corners show the page, not part of a cell.
+- The name is sized `min(56px, 19cqw)` against the text column: one line on the wide card and from about 480px of column, two lines on a phone. The roles are chips under it: 14px labels in 28px chips, wrapping where one line won't hold all three.
 - Entry uses `@starting-style` + an opacity transition (not a keyframe). A global `prefers-reduced-motion` guard neutralizes entry + hover motion.
 
 ## Gotchas
@@ -59,5 +60,5 @@ Colors are **CSS custom properties** defined in `assets/css/style.css` `:root`; 
   into the HTML itself. The templates emit no beacon — that is why `script-src`/`connect-src` in `static/_headers`
   name the `cloudflareinsights.com` origins the injected script needs. Google Analytics fires only when configured
   and not on localhost.
-- Images: `assets/images/` (processed via `resources.Get`) vs `static/` (served as-is).
-- Favicons: the SVG, Apple touch, mask and manifest icons load from `https://brand.ijosh.com/mark/`. `static/favicon.ico` is the one local copy — browsers probe it on this origin, and Google reads ICO but not SVG — so `task check:favicon` fails when it drifts from brand. Keep `/favicon.ico` first in the `<link>` order.
+- Images: the photo, the share image, the mark and the favicons all load from brand.ijosh.com (`visual.image.file` and `shareImage` in `hugo.toml`). `static/` is served as-is: the field tiles and `favicon.ico`.
+- Favicons: the SVG, Apple touch, mask and manifest icons load from `https://brand.ijosh.com/mark/`. `static/favicon.ico` is the one local copy — browsers probe it on this origin, and Google reads ICO but not SVG — so `task check:brand` fails when it drifts from brand (the same task covers `tokens.css` and the fonts). Keep `/favicon.ico` first in the `<link>` order.
