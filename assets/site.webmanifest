@@ -1,7 +1,7 @@
 {
-  "name": "Josh Vaughen",
-  "short_name": "Josh Vaughen",
-  "description": "Josh Vaughen is a machine learning engineer in Seattle who builds AI-integrated training systems, lifts heavy, and has solo-traveled 60+ countries.",
+  "name": {{ site.Params.author | jsonify }},
+  "short_name": {{ site.Params.author | jsonify }},
+  "description": {{ site.Params.description | jsonify }},
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

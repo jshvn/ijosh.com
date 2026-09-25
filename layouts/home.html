@@ -1,0 +1,10 @@
+{{ define "main" }}
+  {{- /* llms.txt is a template in assets/, filled from hugo.toml; nothing links it, so publish it here. */}}
+  {{- (resources.Get "llms.txt" | resources.ExecuteAsTemplate "llms.txt" .).Publish }}
+  {{ partial "photo" . }}
+  <div class="body">
+    {{ partial "intro" . }}
+    {{ partial "bio" . }}
+    {{ partial "buttons" . }}
+  </div>
+{{ end }}

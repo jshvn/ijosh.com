@@ -5,17 +5,15 @@ title = "Josh Vaughen - Machine Learning Engineer in Seattle"
 disableKinds = ["section", "taxonomy", "RSS"]
 enableGitInfo = true
 
-[sitemap]
-  changeFreq = 'monthly'
-  disable = false
-  filename = 'sitemap.xml'
-  priority = 0.8
+[minify]
+  minifyOutput = true
 
 [params]
 
   # Metadata for search engines and social sharing
   author = "Josh Vaughen"
   firstName = "Josh"
+  lastName = "Vaughen"
   jobTitle = "Machine Learning Engineer"
   description = "Josh Vaughen is a machine learning engineer in Seattle who builds AI-integrated training systems, lifts heavy, and has solo-traveled 60+ countries."
   shareImage = "https://brand.ijosh.com/share/jshvn-share-1200x630.jpg"
