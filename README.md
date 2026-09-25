@@ -21,13 +21,13 @@ Requires [Hugo (extended)](https://gohugo.io/) and [go-task](https://taskfile.de
 
 ```sh
 task serve     # live-reloading dev server (hugo server -D -w)
-task build     # production build → public/  (hugo --minify --gc)
+task build     # production build → public/  (hugo --gc; hugo.toml minifies)
 task --list    # all tasks
 ```
 
-> **Cloudflare Pages settings (dashboard):** build command `hugo --minify --gc` (Hugo only
-> minifies HTML with that flag; CSS/fonts are minified by the asset pipeline), and pin the
-> **`HUGO_VERSION`** env var to the tested extended version (currently `0.163.3`).
+> **Cloudflare Pages settings** live in [`jshvn/terraform`](https://github.com/jshvn/terraform)
+> (`account/pages.tf`): the build command, and **`HUGO_VERSION`** pinned to the tested
+> extended version.
 
 ## 🎨 Assets
 
@@ -37,7 +37,7 @@ task --list    # all tasks
 - **Icons** — the social/meta icons are inlined as SVG at build time from `assets/icons/`
   (sourced from Font Awesome Free 6.x). No icon font / CDN is loaded.
 - **CSS** — `assets/css/{tokens,style}.css` are concatenated, minified, and fingerprinted
-  into one `/css/bundle.<hash>.css` in `layouts/partials/head.html`.
+  into one `/css/bundle.<hash>.css` in `layouts/_partials/head.html`.
 - **Field** — the grid background is `static/images/field-{light,dark}.svg`, written by
   `task field` from `scripts/field.mjs`; `task check:field` fails if they drift.
   `assets/js/lattice.js`, the page's one script, rounds the card's height to the grid when

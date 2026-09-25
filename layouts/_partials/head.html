@@ -21,8 +21,13 @@
 <link rel="icon" href="https://brand.ijosh.com/mark/jshvn-icon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="https://brand.ijosh.com/mark/apple-touch-icon-180.png" />
 <link rel="mask-icon" href="https://brand.ijosh.com/mark/safari-pinned-tab.svg" color="#ca486d" />
-<link rel="manifest" href="/site.webmanifest" />
-<link rel="canonical" href="{{ .Site.BaseURL }}"/>
+{{- /* The manifest is a template in assets/, filled from hugo.toml. */}}
+{{- with resources.Get "site.webmanifest" | resources.ExecuteAsTemplate "site.webmanifest" . }}
+<link rel="manifest" href="{{ .RelPermalink }}" />
+{{- end }}
+{{- if ne .Kind "404" }}
+<link rel="canonical" href="{{ .Permalink }}"/>
+{{- end }}
 
 <!-- Social & Open Graph -->
 {{ with .Site.Params.author }}
@@ -37,11 +42,11 @@
   <meta name="twitter:description" content="{{ . }}" />
 {{ end }}
 
-<meta property="og:url" content="{{ .Site.BaseURL }}" />
-<meta itemprop="url" content="{{ .Site.BaseURL }}"/>
+<meta property="og:url" content="{{ .Permalink }}" />
+<meta itemprop="url" content="{{ .Permalink }}"/>
 <meta property="og:type" content="profile" />
-<meta property="profile:first_name" content="Josh" />
-<meta property="profile:last_name" content="Vaughen" />
+<meta property="profile:first_name" content="{{ .Site.Params.firstName }}" />
+<meta property="profile:last_name" content="{{ .Site.Params.lastName }}" />
 <meta property="profile:username" content="ijosh" />
 
 <meta property="og:locale" content="en_US">
@@ -61,77 +66,47 @@
     <meta itemprop="image" content="{{ . }}"/>
 {{- end }}
 
+{{- /* Structured data for the profile page, built from hugo.toml params and the page's front
+       matter. sameAs is every social link but email. */}}
+{{- if .IsHome }}
+{{- $p := .Site.Params }}
+{{- $person := print .Site.BaseURL "#person" }}
+{{- $sameAs := slice }}
+{{- range $network, $url := $p.social }}{{ if ne $network "email" }}{{ $sameAs = $sameAs | append $url }}{{ end }}{{ end }}
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "Person",
-  "@id": "{{ .Site.BaseURL }}#person",
-  "name": "Josh Vaughen",
-  "givenName": "Josh",
-  "familyName": "Vaughen",
-  "alternateName": ["ijosh", "joshthings", "Josh"],
-  "url": "{{ .Site.BaseURL }}",
-  "image": "{{ .Site.Params.visual.image.file }}",
-  "jobTitle": "{{ .Site.Params.jobTitle }}",
-  "description": "{{ .Site.Params.description }}",
-  "knowsAbout": [
-    "Machine Learning",
-    "Artificial Intelligence",
-    "Software Engineering",
-    "Fitness Training",
-    "Solo Travel",
-    "Personal Development"
-  ],
-  "nationality": {
-    "@type": "Country",
-    "name": "United States"
-  },
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Seattle",
-    "addressRegion": "WA",
-    "addressCountry": "US"
-  },
-  "sameAs": [
-    "https://www.instagram.com/joshthings",
-    "https://linkedin.com/in/ijosh",
-    "https://github.com/jshvn",
-    "https://x.com/dvnll",
-    "https://ijosh.com"
-  ],
-  "hasOccupation": {
-    "@type": "Occupation",
-    "name": "{{ .Site.Params.jobTitle }}",
-    "occupationalCategory": "15-1299.09",
-    "skills": "Machine Learning, Python, AI Systems, Health & Training Instrumentation"
-  }
-}
+{{- dict
+  "@context" "https://schema.org"
+  "@type" "Person"
+  "@id" $person
+  "name" $p.author
+  "givenName" $p.firstName
+  "familyName" $p.lastName
+  "alternateName" (slice "ijosh" "joshthings" $p.firstName)
+  "url" .Site.BaseURL
+  "image" $p.visual.image.file
+  "jobTitle" $p.jobTitle
+  "description" $p.description
+  "knowsAbout" (slice "Machine Learning" "Artificial Intelligence" "Software Engineering" "Fitness Training" "Solo Travel" "Personal Development")
+  "nationality" (dict "@type" "Country" "name" "United States")
+  "address" (dict "@type" "PostalAddress" "addressLocality" .Params.location "addressRegion" "WA" "addressCountry" "US")
+  "sameAs" $sameAs
+  "hasOccupation" (dict "@type" "Occupation" "name" $p.jobTitle "occupationalCategory" "15-1299.09" "skills" "Machine Learning, Python, AI Systems, Health & Training Instrumentation")
+  | jsonify | safeJS }}
 </script>
-
 <script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "ProfilePage",
-  "@id": "{{ .Site.BaseURL }}#webpage",
-  "url": "{{ .Site.BaseURL }}",
-  "name": "Josh Vaughen - Machine Learning Engineer, Traveler, Fitness Enthusiast",
-  "description": "{{ .Site.Params.description }}",
-  "mainEntity": {
-    "@id": "{{ .Site.BaseURL }}#person"
-  },
-  "inLanguage": "en-US",
-  "isPartOf": {
-    "@type": "WebSite",
-    "@id": "{{ .Site.BaseURL }}#website",
-    "url": "{{ .Site.BaseURL }}",
-    "name": "Josh Vaughen",
-    "description": "Personal website of Josh Vaughen",
-    "publisher": {
-      "@id": "{{ .Site.BaseURL }}#person"
-    }
-  }
-}
+{{- dict
+  "@context" "https://schema.org"
+  "@type" "ProfilePage"
+  "@id" (print .Site.BaseURL "#webpage")
+  "url" .Permalink
+  "name" .Site.Title
+  "description" $p.description
+  "mainEntity" (dict "@id" $person)
+  "inLanguage" "en-US"
+  "isPartOf" (dict "@type" "WebSite" "@id" (print .Site.BaseURL "#website") "url" .Site.BaseURL "name" $p.author "description" (print "Personal website of " $p.author) "publisher" (dict "@id" $person))
+  | jsonify | safeJS }}
 </script>
+{{- end }}
 
 {{ with .Site.Params.twitterHandle }}
   <meta name="twitter:site" content="@{{ . }}" />
@@ -151,8 +126,3 @@
 {{- if .Site.Params.visual.image.enable }}
 <link rel="preload" as="image" href="{{ .Site.Params.visual.image.file }}" fetchpriority="high" />
 {{- end }}
-
-<!-- Google Analytics -->
-{{ if and (.Site.Config.Services.GoogleAnalytics.ID) (not (in (printf "%#v" .Site.BaseURL) "localhost")) }}
-  {{ template "_internal/google_analytics.html" . }}
-{{ end }}

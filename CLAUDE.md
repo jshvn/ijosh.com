@@ -6,19 +6,20 @@ Personal one-page site for **ijosh.com** — a Hugo static site deployed on Clou
 
 - **Hugo (extended)** static site generator. Config is `hugo.toml` (no theme dir — layouts and assets are vendored directly into the repo).
 - **Cloudflare Pages** auto-deploys on push to `master`. There is no manual deploy step. Develop on any branch other than `master`; only merge/push to `master` when ready to go live.
-- Single page: `content/_index.md` (front matter: `title`, `roles`, `location`; body = bio copy) rendered by `layouts/index.html`.
+- Single page: `content/_index.md` (front matter: `title`, `roles`, `location`; body = bio copy) rendered by `layouts/home.html`.
 
 ## Commands (Taskfile)
 
 - `task serve` — `hugo server -D -w` (drafts + watch).
-- `task build` — production build, `hugo --minify --gc`.
+- `task build` — production build, `hugo --gc`. `[minify] minifyOutput` in `hugo.toml` minifies every build, the server's included.
+- `task check:meta` — fails if the build publishes JSON that doesn't parse, or the email address outside its `mailto:` link.
 - `task visual:check` / `visual:bless` / `visual:vs-live` — see below.
 - `task clean` — remove `public/`, `resources/`, `.hugo_build*`.
 
-### Cloudflare Pages settings (one-time, in the dashboard — not in repo)
+### Cloudflare Pages settings (in `jshvn/terraform`, `account/pages.tf`)
 
-- **Build command:** `hugo --minify --gc` (Hugo only minifies HTML with `--minify`; CSS/fonts are minified by the asset pipeline regardless).
-- **`HUGO_VERSION` env var:** pin to the tested **extended** version (currently `0.163.3`).
+- **Build command:** `git fetch --unshallow || true; hugo --gc`. Pages clones one commit deep, and `enableGitInfo` needs the history to date the sitemap's `lastmod` to the last content change.
+- **`HUGO_VERSION` env var:** the **extended** version `task visual:check` runs on.
 
 ## ⚠️ Visual changes — verify, don't guess
 
@@ -30,17 +31,17 @@ This page is meant to look **identical** across refactors. Rendered pixels are l
 
 ## Layout structure
 
-- `layouts/_default/baseof.html` — base wrapper: `.field` (the grid background) holds `.hole` (a square in the page color) holding `.card`. Every page fills the card through the `main` block.
-- `layouts/index.html` — the card's contents: the `photo` partial, then `.body` with `intro`, `bio` and `buttons`.
-- `layouts/partials/head.html` — all SEO (meta, OpenGraph/Twitter, JSON-LD Person + ProfilePage), favicon/manifest, the CSS bundle, font + LCP preloads, analytics. **Most edits land here** — keep structured data in sync with `hugo.toml` params.
-- Other partials: `photo` (the photo and the place chip), `intro` (the name and the role chips), `bio`, `buttons` (the footer: social links and the mark).
+- `layouts/baseof.html` — base wrapper: `.field` (the grid background) holds `.hole` (a square in the page color) holding `.card`. Every page fills the card through the `main` block.
+- `layouts/home.html` — the card's contents: the `photo` partial, then `.body` with `intro`, `bio` and `buttons`.
+- `layouts/_partials/head.html` — all SEO (meta, OpenGraph/Twitter, JSON-LD Person + ProfilePage), favicon/manifest, the CSS bundle, font + LCP preloads. **Most edits land here.** The JSON-LD is built with `dict` + `jsonify` from `hugo.toml` params and the home page's front matter, and only on the home page.
+- Other partials (in `layouts/_partials/`): `photo` (the photo and the place chip), `intro` (the name and the role chips), `bio`, `buttons` (the footer: social links and the mark).
 
 ## Architecture invariants (don't regress)
 
 - **No third-party runtime assets.** Fonts are self-hosted (`static/fonts/`, `@font-face` in `assets/css/tokens.css`); social/meta icons are inlined SVG at build time from `assets/icons/` (Font Awesome Free 6.x source). Do **not** reintroduce Google Fonts or a Font Awesome CDN. The one cross-origin exception is `brand.ijosh.com` — self-owned, deployed from `jshvn/brand` — which serves the favicon set, the photo, and the mark (`buttons.html` loads `jshvn-mark-on-light.svg` / `-on-dark.svg` through a `<picture>`), and is named under `img-src` in the CSP; keep it there.
 - **CSS** = `assets/css/{tokens,style}.css` concatenated → minified → fingerprinted into one `/css/bundle.<hash>.css` in `head.html`. Add styles to `assets/css/style.css`; don't add new `<link>`s. `tokens.css` is a copy of `https://brand.ijosh.com/tokens.css` — never edit it here.
 - **Security headers / CSP** live in `static/_headers`. Adding an external origin (script/font/frame) requires updating the CSP or the browser blocks it.
-- **Site config drives templates.** Toggle features via `[params]` booleans in `hugo.toml` (`showemail`, `showgithub`, `showtwitter`, `showlocation`, `visual.image`); social URLs, author, description, the photo, and the share image live there too — change config, not template literals.
+- **Site config drives templates.** Toggle features via `[params]` booleans in `hugo.toml` (`showemail`, `showgithub`, `showtwitter`, `showlocation`, `visual.image`); social URLs, author, names, description, the photo, and the share image live there too — change config, not template literals. `assets/site.webmanifest` and `assets/llms.txt` are templates filled from the same params (`resources.ExecuteAsTemplate`).
 
 ## Theming (design tokens + dark mode)
 
@@ -58,7 +59,6 @@ Colors and type come from `assets/css/tokens.css`, the brand's own file: `--bg`,
 
 - Analytics: Cloudflare Web Analytics is enabled per-zone in the Cloudflare dashboard, which injects the beacon
   into the HTML itself. The templates emit no beacon — that is why `script-src`/`connect-src` in `static/_headers`
-  name the `cloudflareinsights.com` origins the injected script needs. Google Analytics fires only when configured
-  and not on localhost.
+  name the `cloudflareinsights.com` origins the injected script needs.
 - Images: the photo, the share image, the mark and the favicons all load from brand.ijosh.com (`visual.image.file` and `shareImage` in `hugo.toml`). `static/` is served as-is: the field tiles and `favicon.ico`.
 - Favicons: the SVG, Apple touch, mask and manifest icons load from `https://brand.ijosh.com/mark/`. `static/favicon.ico` is the one local copy — browsers probe it on this origin, and Google reads ICO but not SVG — so `task check:brand` fails when it drifts from brand (the same task covers `tokens.css` and the fonts). Keep `/favicon.ico` first in the `<link>` order.

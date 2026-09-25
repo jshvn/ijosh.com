@@ -1,0 +1,16 @@
+# {{ site.Params.author }}
+
+> {{ site.Params.description }}
+
+- Website: {{ site.BaseURL }}
+{{- with site.Params.social }}
+{{- if site.Params.showgithub.enable }}
+- GitHub: {{ .github }}
+{{- end }}
+- LinkedIn: {{ .linkedin }}
+- Instagram: {{ .instagram }}
+{{- if site.Params.showtwitter.enable }}
+- X: {{ .twitter }}
+{{- end }}
+{{- end }}
+- Email: see {{ site.BaseURL }} for contact information
