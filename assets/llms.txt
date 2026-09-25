@@ -2,15 +2,17 @@
 
 > {{ site.Params.description }}
 
-- Website: {{ site.BaseURL }}
+## Links
+
+- [Website]({{ site.BaseURL }})
 {{- with site.Params.social }}
 {{- if site.Params.showgithub.enable }}
-- GitHub: {{ .github }}
+- [GitHub]({{ .github }})
 {{- end }}
-- LinkedIn: {{ .linkedin }}
-- Instagram: {{ .instagram }}
+- [LinkedIn]({{ .linkedin }})
+- [Instagram]({{ .instagram }})
 {{- if site.Params.showtwitter.enable }}
-- X: {{ .twitter }}
+- [X]({{ .twitter }})
 {{- end }}
 {{- end }}
-- Email: see {{ site.BaseURL }} for contact information
+- [Email]({{ site.BaseURL }}): the address is on the page, not here
