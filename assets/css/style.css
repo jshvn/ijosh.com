@@ -1,9 +1,11 @@
 /* The page's own layer. Colors, fonts and type roles come from tokens.css (jshvn/brand).
 
    The page is one card on the brand's grid field. The field is a repeating tile
-   (scripts/field.mjs) whose lattice is anchored to the card's top-left corner, so the
-   card's edges fall on cell edges and no cell is cut. A square .hole in the page color
-   sits behind the rounded card, so its corners show the page, not a cell. */
+   (scripts/field.mjs) whose lattice is anchored to the card's top-left corner. The
+   card's width is a cell plus whole pitches, and assets/js/lattice.js rounds its height
+   the same way into --card-h, so every edge falls between cells and no cell is cut. A
+   square .hole in the page color sits behind the rounded card, so its corners show the
+   page, not a cell. */
 
 :root {
   font-synthesis: none;
@@ -39,7 +41,7 @@ h1, p, ul { margin: 0; padding: 0; }
   display: grid;
   justify-items: center;
   align-items: start;
-  padding-top: var(--top);
+  padding-block: var(--top);
   background: var(--field) calc(50% - var(--card-w) / 2) var(--top) / var(--tile) repeat;
 }
 
@@ -48,11 +50,8 @@ h1, p, ul { margin: 0; padding: 0; }
   background: var(--bg);
 }
 
-/* Below the wide layout the card is a sheet that runs to the bottom of the page, so its
-   bottom edge never has to land on the lattice. On a screen taller than the words, the
-   photo takes the extra height. */
 .card {
-  min-height: calc(100dvh - var(--top));
+  min-height: var(--card-h, auto);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -62,7 +61,8 @@ h1, p, ul { margin: 0; padding: 0; }
 
 .photo {
   position: relative;
-  flex: 1 0 300px;
+  flex: none;
+  height: 300px;
 }
 .photo img {
   position: absolute;
@@ -92,6 +92,7 @@ h1, p, ul { margin: 0; padding: 0; }
 }
 
 .body {
+  flex-grow: 1;                          /* the rounding's extra height goes above the footer */
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -213,14 +214,12 @@ a:focus-visible {
     padding: 48px 0;
     background-position: calc(50% - var(--card-w) / 2) calc(50% - var(--card-h) / 2);
   }
-  /* ponytail: content taller than 568px (heavy zoom) grows the card off the lattice, and
-     the row under it shows cut cells. Fine until the bio gets much longer. */
   .card {
-    min-height: var(--card-h);
     display: grid;
     grid-template-columns: 400px minmax(0, 1fr);
     column-gap: 48px;
   }
+  .photo { height: auto; }
   .chip { top: auto; left: 20px; bottom: 20px; }
   .body { padding: 48px 24px 24px 0; }
   .body:only-child { grid-column: 1 / -1; padding-left: 48px; }

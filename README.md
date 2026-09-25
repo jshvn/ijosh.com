@@ -40,6 +40,7 @@ task --list    # all tasks
   into one `/css/bundle.<hash>.css` in `layouts/partials/head.html`.
 - **Field** — the grid background is `static/images/field-{light,dark}.svg`, written by
   `task field` from `scripts/field.mjs`; `task check:field` fails if they drift.
+  `assets/js/lattice.js`, the page's one script, rounds the card's height to the grid.
 
 ## 🧪 Visual regression testing
 
@@ -60,5 +61,5 @@ Golden images live in `tests/visual/golden/` (committed). Diff artifacts land in
 
 One card on the `jshvn/brand` grid field: the photo on the left with the place pinned to it,
 then the roles, the name, the bio, and a footer with the social links and the mark. On
-narrow screens the card stacks into a sheet, photo on top. Colors, type and the mark follow
+narrow screens the card stacks, photo on top. Colors, type and the mark follow
 [brand.ijosh.com](https://brand.ijosh.com).

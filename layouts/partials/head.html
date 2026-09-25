@@ -93,7 +93,7 @@
     "addressCountry": "US"
   },
   "sameAs": [
-    "https://instagram.com/joshthings",
+    "https://www.instagram.com/joshthings",
     "https://linkedin.com/in/ijosh",
     "https://github.com/jshvn",
     "https://x.com/dvnll",
@@ -144,6 +144,8 @@
 {{- $css := slice (resources.Get "css/tokens.css") (resources.Get "css/style.css") | resources.Concat "css/bundle.css" | resources.Minify | resources.Fingerprint -}}
 <link rel="preload" as="font" type="font/woff2" href="/fonts/montserrat-600-latin.woff2" crossorigin />
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
+{{- $js := resources.Get "js/lattice.js" | resources.Minify | resources.Fingerprint }}
+<script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
 
 <!-- LCP preload: the photo -->
 {{- if .Site.Params.visual.image.enable }}
