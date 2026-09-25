@@ -1,31 +1,42 @@
 /* The page's own layer. Colors, fonts and type roles come from tokens.css (jshvn/brand).
 
    The page is one card on the brand's grid field. The field is a repeating tile
-   (scripts/field.mjs) whose lattice is anchored to the card's top-left corner. The
-   card's width is a cell plus whole pitches, and assets/js/lattice.js rounds its height
-   the same way into --card-h, so every edge falls between cells and no cell is cut. A
-   square .hole in the page color sits behind the rounded card, so its corners show the
-   page, not a cell. */
+   (scripts/field.mjs) whose lattice is anchored to the card's top-left corner, and the
+   card's width and height are each a cell plus whole pitches, so every edge falls between
+   cells and no cell is cut. A square .hole in the page color sits behind the rounded card,
+   so its corners show the page, not a cell.
+
+   The card fills the screen less an equal margin above and below, a height CSS can round.
+   When its words are taller than that (a phone), the height comes from the words, and
+   assets/js/lattice.js rounds it into --card-h. */
 
 :root {
   font-synthesis: none;
   --field: url(/images/field-light.svg);
   --pitch: 24px;                         /* the mark's grid: 20px cells, 4px gaps */
   --tile: calc(var(--pitch) * 24);       /* the tile holds 24 x 24 cells */
-  --top: 17px;
-  --card-w: min(100vw - 34px, 596px);
+  --margin: 17px;                        /* the least field showing around the card */
+  --card-w: min(100vw - 2 * var(--margin), 596px);
+  --fill-h: calc(100dvh - 2 * var(--margin));
+  /* The card's top, and so the lattice's: centred, and never closer than --margin. */
+  --top: max(var(--margin), (100dvh - var(--card-h, var(--fill-h))) / 2);
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) { --field: url(/images/field-dark.svg); }
 }
 :root[data-theme="dark"] { --field: url(/images/field-dark.svg); }
 
-/* A card as wide as the lattice allows: 20px plus whole pitches, up to 596px. */
+/* As wide and as tall as the margins allow, in a cell plus whole pitches; 596px wide at most.
+   The top lands on a whole pixel so the card's edges stay sharp. */
 @supports (width: round(down, 100vw, 24px)) {
-  :root { --card-w: calc(20px + round(down, min(100vw - 54px, 576px), var(--pitch))); }
+  :root {
+    --card-w: calc(20px + round(down, min(100vw - 2 * var(--margin) - 20px, 576px), var(--pitch)));
+    --fill-h: calc(20px + round(down, 100dvh - 2 * var(--margin) - 20px, var(--pitch)));
+    --top: max(var(--margin), round(down, (100dvh - var(--card-h, var(--fill-h))) / 2, 1px));
+  }
 }
 @media (min-width: 600px) {
-  :root { --top: 48px; }
+  :root { --margin: 48px; }
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -35,7 +46,8 @@ h1, p, ul { margin: 0; padding: 0; }
 /* ===== Field, hole, card ===== */
 
 /* The background position is the card's corner. A percentage position lands half a tile
-   off, and half a tile is a whole number of pitches, so the lattice stays on the card. */
+   off horizontally, and half a tile is a whole number of pitches, so the lattice stays on
+   the card. */
 .field {
   min-height: 100dvh;
   display: grid;
@@ -51,7 +63,7 @@ h1, p, ul { margin: 0; padding: 0; }
 }
 
 .card {
-  min-height: var(--card-h, auto);
+  min-height: var(--card-h, var(--fill-h));
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -59,10 +71,10 @@ h1, p, ul { margin: 0; padding: 0; }
   background: var(--pill-bg);
 }
 
+/* The photo takes whatever height the card has beyond its words. */
 .photo {
   position: relative;
-  flex: none;
-  height: 300px;
+  flex: 1 0 300px;
 }
 .photo img {
   position: absolute;
@@ -92,7 +104,6 @@ h1, p, ul { margin: 0; padding: 0; }
 }
 
 .body {
-  flex-grow: 1;                          /* the rounding's extra height goes above the footer */
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -209,17 +220,11 @@ a:focus-visible {
     --card-w: 1000px;                    /* 20 pitches + a cell */
     --card-h: 568px;                     /* 11 pitches + a cell */
   }
-  .field {
-    align-items: center;
-    padding: 48px 0;
-    background-position: calc(50% - var(--card-w) / 2) calc(50% - var(--card-h) / 2);
-  }
   .card {
     display: grid;
     grid-template-columns: 400px minmax(0, 1fr);
     column-gap: 48px;
   }
-  .photo { height: auto; }
   .chip { top: auto; left: 20px; bottom: 20px; }
   .body { padding: 48px 24px 24px 0; }
   .body:only-child { grid-column: 1 / -1; padding-left: 48px; }

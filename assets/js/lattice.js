@@ -1,8 +1,9 @@
 // Rounds the card's height up to the field's lattice, a cell plus whole pitches, and
-// publishes it as --card-h. The CSS uses it for the card's min-height and, on the wide
-// layout, to centre the lattice on the card, so the bottom edge falls between cells too.
-// ponytail: without this script the card keeps its natural height, and on a phone the
-// row of cells under it can be cut. Width needs no script; CSS rounds that.
+// publishes it as --card-h for the CSS to size and place the card with. CSS rounds the
+// card when it fills the screen; this only matters when the words are taller than the
+// screen (a phone, or zoomed text), where the height comes from how they wrap.
+// ponytail: without this script a phone's card keeps its natural height, and the row of
+// cells under it can be cut. Nothing else depends on it.
 const root = document.documentElement;
 const card = document.querySelector('.card');
 
