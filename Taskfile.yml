@@ -1,62 +1,96 @@
+# ijosh.com: a one-page Hugo site that Cloudflare Pages builds from master. Every task runs in
+# the toolbox image (docker/Dockerfile) with the repo mounted at /work, so a visual check here
+# renders exactly what the goldens hold; the host needs only a container engine and go-task.
 version: "3"
 
 vars:
-  GIT_DIR:
-    sh: pwd
+  IMAGE: ijosh-toolbox
+  ENGINE:
+    sh: |
+      if [ -n "$ENGINE" ]; then echo "$ENGINE"
+      elif command -v container >/dev/null 2>&1 && container system status >/dev/null 2>&1; then echo container
+      elif command -v docker >/dev/null 2>&1; then echo docker
+      elif command -v container >/dev/null 2>&1; then echo container
+      else echo docker
+      fi
 
 tasks:
   default:
-    desc: List all available tasks
+    desc: Print the menu
+    silent: true
+    # ponytail: hand-maintained menu, since go-task can neither group nor annotate
     cmds:
-      - task --list
-
-  server:
-    desc: Build and serve hugo content
-    aliases: [ serve, serv ]
-    cmds:
-      - hugo server -D -w
+      - |
+        b=$(printf '\033[1m'); c=$(printf '\033[1;36m'); d=$(printf '\033[2m'); r=$(printf '\033[0m')
+        printf '%s\n' \
+          "" \
+          "${b}ijosh.com${r}   ${d}the one-page site Cloudflare Pages builds from master${r}" \
+          "" \
+          "${c}checks -- offline, changes nothing${r}" \
+          "  task visual:check         Screenshot the build light and dark, desktop and mobile; diff against the goldens" \
+          "                            ${d}run after any change to layouts/ or assets/css/${r}" \
+          "  task check:meta           The built JSON parses; the email address is only in its mailto: link" \
+          "  task check:field          The field tiles match what scripts/field.mjs writes" \
+          "" \
+          "${c}checks -- reach the network, change nothing${r}" \
+          "  task check:brand          The brand files kept here match brand.ijosh.com" \
+          "                            ${d}runs on the host: curl and cmp only${r}" \
+          "  task visual:vs-live       Diff the local page against the live ijosh.com" \
+          "" \
+          "${c}build -- writes public/ or committed files${r}" \
+          "  task build                Production build into public/, as Pages runs it" \
+          "  task serve                Live-reloading server on http://localhost:1313" \
+          "  task field                Rewrite static/images/field-{light,dark}.svg" \
+          "  task visual:bless         Re-capture the goldens in tests/visual/golden/" \
+          "                            ${d}only after an intended visual change; commit the PNGs${r}" \
+          "" \
+          "${c}toolbox -- the image every task runs in${r}" \
+          "  task image                Build the toolbox image ({{.IMAGE}}, {{.ENGINE}})" \
+          "  task run -- <cmd>         Run any command inside it with the repo mounted" \
+          "  task clean                Remove build output, visual diffs and the image" \
+          "                            ${d}needed after a docker/Dockerfile edit; image presence is the freshness check${r}" \
+          ""
 
   build:
-    desc: Production build (minified, garbage-collected) — matches Cloudflare Pages
+    desc: Production build into public/, as Cloudflare Pages runs it
+    deps: [image]
     cmds:
-      - hugo --gc
+      - task: run
+        vars: { CLI_ARGS: hugo --gc }
 
-  clean:
-    desc: Remove generated and auxiliary files
+  serve:
+    desc: Live-reloading dev server on http://localhost:1313
+    aliases: [server, serv]
+    deps: [image]
     cmds:
-      - rm -rf {{.GIT_DIR}}/public/
-      - rm -rf {{.GIT_DIR}}/resources/
-      - rm -rf {{.GIT_DIR}}/tests/visual/out/
-      - rm -f {{.GIT_DIR}}/.hugo_build* {{.GIT_DIR}}/hugo_stats.json
+      # --poll: file events from the host do not reliably cross the engine's mount.
+      - task: run
+        vars:
+          PUBLISH: -p 1313:1313
+          CLI_ARGS: hugo server --bind 0.0.0.0 --baseURL http://localhost:1313/ --poll 700ms
 
-  clean:deep:
-    desc: Remove generated files plus the visual-test virtualenv (slow to rebuild)
-    deps: [clean]
+  check:meta:
+    desc: Fail if the build publishes JSON that does not parse, or the email address outside its mailto link
+    deps: [image]
     cmds:
-      - rm -rf {{.GIT_DIR}}/.venv-visual/
+      - task: run
+        vars: { CLI_ARGS: hugo --gc }
+      - task: run
+        vars: { CLI_ARGS: node scripts/check-meta.mjs }
 
-  visual:setup:
-    desc: Create the visual-test virtualenv (Pillow + Playwright)
-    internal: true
+  check:field:
+    desc: Fail if the committed field tiles differ from what scripts/field.mjs writes
+    deps: [image]
     cmds:
-      - python3 -m venv .venv-visual
-      - ./.venv-visual/bin/pip install --quiet --upgrade pip Pillow playwright
-    status:
-      - ./.venv-visual/bin/python -c "import PIL, playwright"
+      - task: run
+        vars: { CLI_ARGS: node scripts/field.mjs --check }
 
-  visual:bless:
-    desc: Capture the current build as the golden visual baseline (re-run after intended UI changes)
-    deps: [visual:setup]
+  field:
+    desc: Regenerate the background field tiles (static/images/field-*.svg)
+    deps: [image]
     cmds:
-      - hugo --gc
-      - ./.venv-visual/bin/python scripts/visual-diff.py bless
-
-  visual:check:
-    desc: Fail if the current build drifts visually from the golden baseline
-    deps: [visual:setup]
-    cmds:
-      - hugo --gc
-      - ./.venv-visual/bin/python scripts/visual-diff.py check
+      - task: run
+        vars: { CLI_ARGS: node scripts/field.mjs }
 
   check:brand:
     desc: Fail if a brand file kept on this origin (favicon, tokens, fonts) has drifted from brand.ijosh.com
@@ -77,25 +111,55 @@ tasks:
         [ "$stale" = 0 ] && echo "check:brand: every copy matches brand.ijosh.com"
         exit $stale
 
-  check:meta:
-    desc: Fail if the build publishes JSON that does not parse, or the email address outside its mailto link
+  visual:check:
+    desc: Fail if the current build drifts visually from the golden baseline
+    deps: [image]
     cmds:
-      - hugo --gc
-      - node scripts/check-meta.mjs
+      - task: run
+        vars: { CLI_ARGS: hugo --gc }
+      - task: run
+        vars: { CLI_ARGS: python3 scripts/visual-diff.py check }
 
-  field:
-    desc: Regenerate the background field tiles (static/images/field-*.svg)
+  visual:bless:
+    desc: Capture the current build as the golden visual baseline (re-run after intended UI changes)
+    deps: [image]
     cmds:
-      - node scripts/field.mjs
-
-  check:field:
-    desc: Fail if the committed field tiles differ from what scripts/field.mjs writes
-    cmds:
-      - node scripts/field.mjs --check
+      - task: run
+        vars: { CLI_ARGS: hugo --gc }
+      - task: run
+        vars: { CLI_ARGS: python3 scripts/visual-diff.py bless }
 
   visual:vs-live:
     desc: Compare the local page against the live site (ijosh.com)
-    deps: [visual:setup]
+    deps: [image]
     cmds:
-      - hugo --gc
-      - ./.venv-visual/bin/python scripts/visual-diff.py vs-live
+      - task: run
+        vars: { CLI_ARGS: hugo --gc }
+      - task: run
+        vars: { CLI_ARGS: python3 scripts/visual-diff.py vs-live }
+
+  image:
+    desc: Build the toolbox image
+    run: once
+    # Image presence is the freshness check; a Dockerfile edit needs `task clean` first.
+    status:
+      - '{{.ENGINE}} image inspect {{.IMAGE}} >/dev/null 2>&1'
+    cmds:
+      - '{{.ENGINE}} build -t {{.IMAGE}} docker/'
+
+  run:
+    desc: 'Run any command in the toolbox image, e.g. task run -- hugo version'
+    cmds:
+      - >-
+        {{.ENGINE}} run --rm -i $(test -t 0 && test -t 1 && echo -t || true)
+        --user $(id -u):$(id -g)
+        -v "{{.ROOT_DIR}}":/work -w /work
+        -e HOME=/tmp
+        {{.PUBLISH}}
+        {{.IMAGE}} {{.CLI_ARGS}}
+
+  clean:
+    desc: Remove build output, visual diffs and the toolbox image
+    cmds:
+      - rm -rf public resources tests/visual/out .hugo_build.lock hugo_stats.json
+      - '{{.ENGINE}} image rm {{.IMAGE}} >/dev/null 2>&1 || true'

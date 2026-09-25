@@ -9,14 +9,12 @@ Modes:
   check    capture the local build and diff against the golden (exit 1 over threshold)
   vs-live  diff the local page against a live URL (for matching a deploy)
 
-Rendering uses Playwright driving the Chromium already on the machine; diffing uses Pillow.
-Run via the Taskfile (`task visual:check`) so the venv + build are set up for you.
+Rendering uses Playwright's Chromium and diffing uses Pillow, both from the toolbox image
+(docker/Dockerfile). Run via the Taskfile (`task visual:check`), which builds and runs it there.
 """
 import argparse
 import functools
-import glob
 import http.server
-import os
 import sys
 import threading
 from pathlib import Path
@@ -25,7 +23,7 @@ try:
     from PIL import Image, ImageChops
     from playwright.sync_api import sync_playwright
 except ImportError as exc:
-    sys.exit(f"missing dependency ({exc}) — run `task visual:setup`.")
+    sys.exit(f"missing dependency ({exc}) — run this through the Taskfile, in the toolbox image.")
 
 ROOT = Path.cwd()
 VIS = ROOT / "tests" / "visual"
@@ -36,27 +34,6 @@ OUT = VIS / "out"
 # runs past the first screen, is captured whole.
 VIEWPORTS = {"desktop": (1440, 900), "mobile": (390, 844)}
 SCHEMES = ("light", "dark")
-
-
-def find_chrome() -> str:
-    if os.environ.get("CHROME"):
-        return os.environ["CHROME"]
-    home = str(Path.home())
-    patterns = [
-        home + "/Library/Caches/ms-playwright/chromium-*/chrome-mac*/*.app/Contents/MacOS/*",
-        "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
-        "/Applications/Chromium.app/Contents/MacOS/Chromium",
-    ]
-    for pat in patterns:
-        for match in glob.glob(pat):
-            if os.access(match, os.X_OK):
-                return match
-    from shutil import which
-    for name in ("google-chrome", "chromium", "chrome"):
-        found = which(name)
-        if found:
-            return found
-    sys.exit("No Chrome/Chromium found. Set $CHROME to a browser binary.")
 
 
 class _QuietHandler(http.server.SimpleHTTPRequestHandler):
@@ -71,19 +48,30 @@ def serve(directory: Path):
     return httpd, httpd.server_address[1]
 
 
-def shoot(browser, url: str, path: Path, w: int, h: int, scheme: str = "light") -> None:
+def shoot(browser, url: str, path: Path, w: int, h: int, scheme: str = "light", tries: int = 3) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    page = browser.new_page(
-        viewport={"width": w, "height": h},
-        device_scale_factor=1,
-        color_scheme=scheme,
-        reduced_motion="reduce",  # neutralizes the entry fade -> deterministic capture
-    )
-    # Analytics beacon is irrelevant to layout and can stall `load`; drop it.
-    page.route("**cloudflareinsights.com**", lambda route: route.abort())
-    page.goto(url, wait_until="load", timeout=30000)
-    page.screenshot(path=str(path.resolve()), full_page=True)
-    page.close()
+    # The photo and the mark load from brand.ijosh.com, and inside the toolbox Chromium now and
+    # then aborts them with ERR_NETWORK_CHANGED. A capture with a failed request is retaken.
+    for _ in range(tries):
+        page = browser.new_page(
+            viewport={"width": w, "height": h},
+            device_scale_factor=1,
+            color_scheme=scheme,
+            reduced_motion="reduce",  # neutralizes the entry fade -> deterministic capture
+        )
+        failed = []
+        page.on("requestfailed", lambda r: failed.append(f"{r.url} {r.failure}")
+                if "cloudflareinsights.com" not in r.url else None)
+        # Analytics beacon is irrelevant to layout and can stall `load`; drop it.
+        page.route("**cloudflareinsights.com**", lambda route: route.abort())
+        page.goto(url, wait_until="load", timeout=30000)
+        if not failed:
+            page.screenshot(path=str(path.resolve()), full_page=True)
+            page.close()
+            return
+        page.close()
+        print(f"retaking {path.name}: {failed[0]}")
+    sys.exit(f"{path.name}: requests failed on every one of {tries} tries: {failed}")
 
 
 def diff(ref: Path, cur: Path, out: Path, tol: int):
@@ -107,7 +95,7 @@ def cmd_bless(args):
     httpd, port = serve(args.serve_dir)
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(executable_path=find_chrome())
+            browser = p.chromium.launch()
             for name, (w, h) in VIEWPORTS.items():
                 for scheme in SCHEMES:
                     out = GOLD / f"{name}-{scheme}.png"
@@ -123,7 +111,7 @@ def cmd_check(args):
     failed = False
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(executable_path=find_chrome())
+            browser = p.chromium.launch()
             for name, (w, h) in VIEWPORTS.items():
                 for scheme in SCHEMES:
                     tag = f"{name}-{scheme}"
@@ -151,7 +139,7 @@ def cmd_vslive(args):
     ok = False
     try:
         with sync_playwright() as p:
-            browser = p.chromium.launch(executable_path=find_chrome())
+            browser = p.chromium.launch()
             w, h = VIEWPORTS["desktop"]
             local, ref = OUT / "vslive-local.png", OUT / "vslive-ref.png"
             shoot(browser, f"http://127.0.0.1:{port}/", local, w, h, "light")

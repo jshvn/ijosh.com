@@ -5,25 +5,28 @@ Personal one-page site for **ijosh.com** — a Hugo static site deployed on Clou
 ## Stack & deploy
 
 - **Hugo (extended)** static site generator. Config is `hugo.toml` (no theme dir — layouts and assets are vendored directly into the repo).
+- **Every task runs in the toolbox image** (`docker/Dockerfile`: Hugo, node, Playwright's Chromium, Pillow) with the repo at `/work`. The host needs go-task and a container engine: Apple `container` when its daemon is up, else Docker; `ENGINE=docker` forces it. `task run -- <cmd>` runs anything in it. The one exception is `task check:brand`, which is curl and cmp on the host.
 - **Cloudflare Pages** auto-deploys on push to `master`. There is no manual deploy step. Develop on any branch other than `master`; only merge/push to `master` when ready to go live.
 - Single page: `content/_index.md` (front matter: `title`, `roles`, `location`; body = bio copy) rendered by `layouts/home.html`.
 
 ## Commands (Taskfile)
 
-- `task serve` — `hugo server -D -w` (drafts + watch).
+Bare `task` prints the menu, grouped by what each task changes.
+
+- `task serve` — `hugo server` on http://localhost:1313, polling for changes (the engine's mount carries no file events).
 - `task build` — production build, `hugo --gc`. `[minify] minifyOutput` in `hugo.toml` minifies every build, the server's included.
 - `task check:meta` — fails if the build publishes JSON that doesn't parse, or the email address outside its `mailto:` link.
 - `task visual:check` / `visual:bless` / `visual:vs-live` — see below.
-- `task clean` — remove `public/`, `resources/`, `.hugo_build*`.
+- `task clean` — remove `public/`, `resources/`, the visual diffs and the toolbox image. Image presence is the freshness check, so a `docker/Dockerfile` edit needs a `task clean` first.
 
 ### Cloudflare Pages settings (in `jshvn/terraform`, `account/pages.tf`)
 
 - **Build command:** `git fetch --unshallow || true; hugo --gc`. Pages clones one commit deep, and `enableGitInfo` needs the history to date the sitemap's `lastmod` to the last content change.
-- **`HUGO_VERSION` env var:** the **extended** version `task visual:check` runs on.
+- **`HUGO_VERSION` env var:** must equal `HUGO_VERSION` in `docker/Dockerfile`, which is what every local build and `task visual:check` runs on.
 
 ## ⚠️ Visual changes — verify, don't guess
 
-This page is meant to look **identical** across refactors. Rendered pixels are locked to golden baselines in `tests/visual/golden/`, captured for **both** `light` and `dark` color schemes × desktop/mobile (`{viewport}-{scheme}.png`).
+This page is meant to look **identical** across refactors. Rendered pixels are locked to golden baselines in `tests/visual/golden/`, captured for **both** `light` and `dark` color schemes × desktop/mobile (`{viewport}-{scheme}.png`) by the toolbox image's Chromium. Its digest fixes the fonts and rasterizer, so a new base image digest means `task visual:bless`.
 
 - **Never report a change to `layouts/` or `assets/css/` as done without running `task visual:check`.** It screenshots the build and fails on any drift. Reasoning about CSS is not verification — render it.
 - Matching an external reference (e.g. the live site): use `task visual:vs-live` and the pixel measurements. Do not eyeball-and-guess sizes/colors/spacing.

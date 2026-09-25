@@ -17,17 +17,20 @@ minified + fingerprinted, and security headers ship via `static/_headers`.
 
 ## 💻 Development
 
-Requires [Hugo (extended)](https://gohugo.io/) and [go-task](https://taskfile.dev/).
+Requires [go-task](https://taskfile.dev/) and a container engine: Apple `container` when its
+daemon is up, Docker otherwise (`ENGINE=docker` forces it). Every task runs in the toolbox
+image, `docker/Dockerfile` (Hugo, node, and Playwright's Chromium with Pillow), with the repo
+mounted; the first task builds it.
 
 ```sh
-task serve     # live-reloading dev server (hugo server -D -w)
+task           # the menu, grouped by what each task changes
+task serve     # live-reloading dev server on http://localhost:1313
 task build     # production build → public/  (hugo --gc; hugo.toml minifies)
-task --list    # all tasks
 ```
 
 > **Cloudflare Pages settings** live in [`jshvn/terraform`](https://github.com/jshvn/terraform)
-> (`account/pages.tf`): the build command, and **`HUGO_VERSION`** pinned to the tested
-> extended version.
+> (`account/pages.tf`): the build command, and **`HUGO_VERSION`**, which must equal
+> `HUGO_VERSION` in `docker/Dockerfile`.
 
 ## 🎨 Assets
 
@@ -46,7 +49,8 @@ task --list    # all tasks
 ## 🧪 Visual regression testing
 
 The page is meant to look identical across refactors, so the rendered pixels are locked to a
-golden baseline. First run creates a `.venv-visual/` (Pillow) and uses the machine's Chromium.
+golden baseline, rendered by the toolbox image's Chromium. The image is pinned by digest, so
+its fonts and rasterizer are too; a new digest means re-blessing.
 
 ```sh
 task visual:check     # fail if the build drifts from the golden baseline
