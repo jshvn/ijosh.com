@@ -58,19 +58,37 @@ tasks:
       - hugo --minify --gc
       - ./.venv-visual/bin/python scripts/visual-diff.py check
 
-  check:favicon:
-    desc: Fail if static/favicon.ico has drifted from the one brand.ijosh.com serves
+  check:brand:
+    desc: Fail if a brand file kept on this origin (favicon, tokens, fonts) has drifted from brand.ijosh.com
     cmds:
-      # The one brand file kept on this origin, and so the one that can go stale.
+      # The brand files a site serves from its own origin, and so the ones that can go stale.
       - |
-        live=$(mktemp)
-        curl -sSf --max-time 20 -o "$live" https://brand.ijosh.com/mark/favicon.ico
-        cmp -s "$live" static/favicon.ico && echo "check:favicon: matches brand.ijosh.com" \
-          || { echo "check:favicon: static/favicon.ico differs from brand.ijosh.com/mark/favicon.ico -- copy it over"; rm -f "$live"; exit 1; }
-        rm -f "$live"
+        stale=0
+        for pair in static/favicon.ico:mark/favicon.ico assets/css/tokens.css:tokens.css \
+            static/fonts/graduate-400-latin.woff2:fonts/graduate-400-latin.woff2 \
+            static/fonts/montserrat-600-latin.woff2:fonts/montserrat-600-latin.woff2 \
+            static/fonts/montserrat-600-latin-ext.woff2:fonts/montserrat-600-latin-ext.woff2 \
+            static/fonts/pt-serif-400-latin.woff2:fonts/pt-serif-400-latin.woff2 \
+            static/fonts/pt-serif-400-latin-ext.woff2:fonts/pt-serif-400-latin-ext.woff2; do
+          local_file=${pair%%:*}; url=https://brand.ijosh.com/${pair#*:}
+          curl -sSf --max-time 20 "$url" | cmp -s - "$local_file" \
+            || { echo "check:brand: $local_file differs from $url -- copy it over"; stale=1; }
+        done
+        [ "$stale" = 0 ] && echo "check:brand: every copy matches brand.ijosh.com"
+        exit $stale
+
+  field:
+    desc: Regenerate the background field tiles (static/images/field-*.svg)
+    cmds:
+      - node scripts/field.mjs
+
+  check:field:
+    desc: Fail if the committed field tiles differ from what scripts/field.mjs writes
+    cmds:
+      - node scripts/field.mjs --check
 
   visual:vs-live:
-    desc: Compare the local content panel against the live site (ijosh.com)
+    desc: Compare the local page against the live site (ijosh.com)
     deps: [visual:setup]
     cmds:
       - hugo --minify --gc

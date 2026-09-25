@@ -7,7 +7,7 @@ and fails the build on unintended drift.
 Modes:
   bless    capture the local build and save it as the golden baseline
   check    capture the local build and diff against the golden (exit 1 over threshold)
-  vs-live  diff the local content panel against a live URL (for matching a deploy)
+  vs-live  diff the local page against a live URL (for matching a deploy)
 
 Rendering uses Playwright driving the Chromium already on the machine; diffing uses Pillow.
 Run via the Taskfile (`task visual:check`) so the venv + build are set up for you.
@@ -32,8 +32,8 @@ VIS = ROOT / "tests" / "visual"
 GOLD = VIS / "golden"
 OUT = VIS / "out"
 
-# Viewports are the initial size; screenshots are full-page, so the tall stacked
-# mobile content (below the 80vh photo) is captured, not just the viewport.
+# Viewports are the initial size; screenshots are full-page, so the phone card, which
+# runs past the first screen, is captured whole.
 VIEWPORTS = {"desktop": (1440, 900), "mobile": (390, 844)}
 SCHEMES = ("light", "dark")
 
@@ -86,31 +86,15 @@ def shoot(browser, url: str, path: Path, w: int, h: int, scheme: str = "light") 
     page.close()
 
 
-def _saturation(img):
-    r, g, b = img.split()
-    hi = ImageChops.lighter(ImageChops.lighter(r, g), b)
-    lo = ImageChops.darker(ImageChops.darker(r, g), b)
-    return ImageChops.difference(hi, lo)  # 0 = grey, high = colorful
-
-
-def diff(ref: Path, cur: Path, out: Path, tol: int, sat: int = 40, crop=None):
+def diff(ref: Path, cur: Path, out: Path, tol: int):
     a = Image.open(ref).convert("RGB")
     b = Image.open(cur).convert("RGB")
     if a.size != b.size:  # tolerate height drift; compare the common region
         w, h = min(a.size[0], b.size[0]), min(a.size[1], b.size[1])
         a, b = a.crop((0, 0, w, h)), b.crop((0, 0, w, h))
-    if crop:
-        a, b = a.crop(crop), b.crop(crop)
     d = ImageChops.difference(a, b).split()
     max_chan = ImageChops.lighter(ImageChops.lighter(d[0], d[1]), d[2])
-    changed = max_chan.point(lambda v: 255 if v > tol else 0)
-    # The design is monochrome, so any saturated pixel is the flag emoji, which
-    # color-rasterizes nondeterministically per capture — exclude it from the diff.
-    keep = ImageChops.darker(
-        _saturation(a).point(lambda v: 255 if v <= sat else 0),
-        _saturation(b).point(lambda v: 255 if v <= sat else 0),
-    )
-    mask = ImageChops.darker(changed, keep)
+    mask = max_chan.point(lambda v: 255 if v > tol else 0)
     count = mask.histogram()[-1]  # count of 255-valued (changed) pixels, C-fast
     base = a.convert("L").convert("RGB")
     red = Image.new("RGB", a.size, (255, 40, 40))
@@ -172,12 +156,10 @@ def cmd_vslive(args):
             local, ref = OUT / "vslive-local.png", OUT / "vslive-ref.png"
             shoot(browser, f"http://127.0.0.1:{port}/", local, w, h, "light")
             shoot(browser, args.ref, ref, w, h, "light")
-            # Right-hand content panel only: the photo uses a different image
-            # pipeline than live, so comparing it produces noise, not signal.
-            changed, total = diff(ref, local, OUT / "vslive-diff.png", args.tol, crop=(720, 0, w, h))
+            changed, total = diff(ref, local, OUT / "vslive-diff.png", args.tol)
             ratio = changed / total
             ok = ratio <= args.threshold
-            print(f"[{'PASS' if ok else 'FAIL'}] content panel vs {args.ref}: "
+            print(f"[{'PASS' if ok else 'FAIL'}] page vs {args.ref}: "
                   f"{ratio * 100:.3f}% differ ({changed}/{total}px) -> {OUT / 'vslive-diff.png'}")
             browser.close()
     finally:
@@ -194,7 +176,7 @@ def main():
     sub.add_parser("bless").set_defaults(func=cmd_bless)
 
     c = sub.add_parser("check")
-    c.add_argument("--threshold", type=float, default=0.001, help="max changed-pixel ratio to pass (default: 0.001 = 0.1%%); margin over emoji-edge noise, below real-regression signal")
+    c.add_argument("--threshold", type=float, default=0.001, help="max changed-pixel ratio to pass (default: 0.001 = 0.1%%); margin over anti-aliasing noise, below real-regression signal")
     c.set_defaults(func=cmd_check)
 
     v = sub.add_parser("vs-live")

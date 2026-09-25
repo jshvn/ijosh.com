@@ -1,163 +1,246 @@
-/* ===== Design tokens ===== */
+/* The page's own layer. Colors, fonts and type roles come from tokens.css (jshvn/brand).
+
+   The page is one card on the brand's grid field. The field is a repeating tile
+   (scripts/field.mjs) whose lattice is anchored to the card's top-left corner, so the
+   card's edges fall on cell edges and no cell is cut. A square .hole in the page color
+   sits behind the rounded card, so its corners show the page, not a cell. */
+
 :root {
-  color-scheme: light;
-  --bg: #ffffff;
-  --text: #333333;          /* name, role/place tiles */
-  --icon: #000000;          /* social icons, place pin */
-  --text-muted: #6b7280;    /* UI greys + links — WCAG AA ~4.9:1 on white */
-  --text-body: #4b5563;     /* bio reading text — ~7.5:1 */
-  --accent: #ca486d;        /* link hover */
-  --tile-bg: rgba(51, 51, 51, 0.1);
+  font-synthesis: none;
+  --field: url(/images/field-light.svg);
+  --pitch: 24px;                         /* the mark's grid: 20px cells, 4px gaps */
+  --tile: calc(var(--pitch) * 24);       /* the tile holds 24 x 24 cells */
+  --top: 17px;
+  --card-w: min(100vw - 34px, 596px);
 }
-
 @media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #17191c;          /* neutral charcoal */
-    --text: #f4f7fb;
-    --icon: #f4f7fb;
-    --text-muted: #9aa7b4;  /* AA on dark grey */
-    --text-body: #c6d0da;
-    --accent: #e98aa3;      /* lighter pink for dark bg */
-    --tile-bg: rgba(255, 255, 255, 0.1);
-  }
+  :root:not([data-theme="light"]) { --field: url(/images/field-dark.svg); }
+}
+:root[data-theme="dark"] { --field: url(/images/field-dark.svg); }
+
+/* A card as wide as the lattice allows: 20px plus whole pitches, up to 596px. */
+@supports (width: round(down, 100vw, 24px)) {
+  :root { --card-w: calc(20px + round(down, min(100vw - 54px, 576px), var(--pitch))); }
+}
+@media (min-width: 600px) {
+  :root { --top: 48px; }
 }
 
-/* ===== Modern entry animation (replaces @keyframes fade-in) ===== */
-body.page-template-page-fullsingle-split {
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); }
+h1, p, ul { margin: 0; padding: 0; }
+
+/* ===== Field, hole, card ===== */
+
+/* The background position is the card's corner. A percentage position lands half a tile
+   off, and half a tile is a whole number of pitches, so the lattice stays on the card. */
+.field {
+  min-height: 100dvh;
+  display: grid;
+  justify-items: center;
+  align-items: start;
+  padding-top: var(--top);
+  background: var(--field) calc(50% - var(--card-w) / 2) var(--top) / var(--tile) repeat;
+}
+
+.hole {
+  width: var(--card-w);
+  background: var(--bg);
+}
+
+/* Below the wide layout the card is a sheet that runs to the bottom of the page, so its
+   bottom edge never has to land on the lattice. On a screen taller than the words, the
+   photo takes the extra height. */
+.card {
+  min-height: calc(100dvh - var(--top));
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--pill-bg);
+}
+
+.photo {
+  position: relative;
+  flex: 1 0 300px;
+}
+.photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.chip {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: var(--bg);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.chip svg {
+  height: 14px;
+  width: auto;
+  fill: var(--icon);
+}
+
+.body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  container-type: inline-size;
+}
+
+/* ===== Type ===== */
+
+.label {
+  font: 400 14px/1 var(--font-label);
+  letter-spacing: var(--font-label-tracking);
+  margin-right: calc(-1 * var(--font-label-tracking)); /* drop the tracking after the last letter */
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* Roles on one line, a small square between each. Where the line would wrap, they stack. */
+.roles {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.roles li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.roles li + li::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 1.2px;
+  background: var(--text-muted);
+}
+@container (max-width: 400px) {
+  .roles { flex-direction: column; align-items: flex-start; }
+  .roles li + li::before { display: none; }
+}
+
+/* 19cqw keeps VAUGHEN (5.1em) inside the narrowest phone card; the name wraps to two
+   lines there and sits on one from about 480px of text column. */
+h1 {
+  font: var(--font-display-weight) min(56px, 19cqw)/1 var(--font-display);
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.bio {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.bio p {
+  max-width: 62ch;
+  font: 400 16px/var(--font-text-leading) var(--font-text);
+  letter-spacing: 0.01em;
+  color: var(--text-body);
+}
+.bio a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+/* ===== Footer: socials left, the mark signing the right ===== */
+
+.foot {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.social {
+  display: flex;
+  gap: 4px;
+  margin-left: -10px;                    /* align the first glyph, not its touch target */
+}
+.social a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  color: var(--icon);
+  transition: color 0.15s ease-out;
+}
+.social a:hover { color: var(--accent); }
+.social svg {
+  height: 24px;
+  width: auto;
+  display: block;
+}
+.mark,
+.mark img {
+  display: block;
+  width: 56px;
+  height: 56px;
+  margin-right: -9px;                    /* the mark's own clear space, not a gap */
+}
+
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ===== Wide: photo pane left, words right, on the 48px lattice ===== */
+
+@media (min-width: 1100px) {
+  :root {
+    --pitch: 48px;
+    --card-w: 1000px;                    /* 20 pitches + a cell */
+    --card-h: 568px;                     /* 11 pitches + a cell */
+  }
+  .field {
+    align-items: center;
+    padding: 48px 0;
+    background-position: calc(50% - var(--card-w) / 2) calc(50% - var(--card-h) / 2);
+  }
+  /* ponytail: content taller than 568px (heavy zoom) grows the card off the lattice, and
+     the row under it shows cut cells. Fine until the bio gets much longer. */
+  .card {
+    min-height: var(--card-h);
+    display: grid;
+    grid-template-columns: 400px minmax(0, 1fr);
+    column-gap: 48px;
+  }
+  .chip { top: auto; left: 20px; bottom: 20px; }
+  .body { padding: 48px 24px 24px 0; }
+  .body:only-child { grid-column: 1 / -1; padding-left: 48px; }
+}
+
+/* ===== Motion ===== */
+
+body {
   opacity: 1;
   transition: opacity 0.8s ease;
 }
 @starting-style {
-  body.page-template-page-fullsingle-split {
-    opacity: 0;
-  }
+  body { opacity: 0; }
 }
 
-/* Respect reduced-motion: neutralize entry fade + hover transitions */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-*, *::before, *::after { box-sizing: border-box; }
-
-html, body { height: 100%; }
-
-/* ===== Bento panel =====
-   The content column is the query container: tiles pick 6 or 4 columns from its own
-   width rather than the viewport, so one rule serves the split layout and the stacked one.
-   Sizes follow the mark's grid — a 20-unit cell with a 4-unit gap and rx 4 — scaled to a
-   64px unit: 8px gap, 16px radius. */
-.split-content-vertically-center {
-  width: 100%;                            /* containment zeroes content-based width */
-  container-type: inline-size;
-}
-
-.bento {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  grid-auto-rows: minmax(72px, auto);
-  gap: 8px;
-}
-
-.tile {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  padding: 14px;
-  border-radius: 14px;
-  background: var(--tile-bg);
-}
-.tile--name, .tile--bio, .tile--social { grid-column: span 4; }
-.tile--mark, .tile--word { grid-column: span 2; }
-.tile--mark { grid-row: span 2; }
-
-/* 409px is the narrowest column where a two-column word tile still holds ENGINEER at
-   14px Graduate with .28em tracking (111px) inside its padding. */
-@container (min-width: 409px) {
-  .bento {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    grid-auto-rows: minmax(64px, auto);
-  }
-  .tile {
-    padding: 16px;
-    border-radius: 16px;
-  }
-  .tile--name, .tile--bio, .tile--social { grid-column: span 6; }
-}
-
-/* Name: one line, sized to its tile. 11.6cqw fits "JOSH VAUGHEN" (8.36em) with 3% slack. */
-.tile--name {
-  container-type: inline-size;
-  text-align: center;
-}
-.tile--name h1 {
-  font-family: "Montserrat", sans-serif;
-  font-weight: 700;
-  text-transform: uppercase;
-  font-size: 2.25rem;                     /* browsers without container units */
-  font-size: clamp(30px, 11.6cqw, 54px);
-  line-height: 1;
-  color: var(--text);
-}
-
-.tile--mark img {
-  width: 80px;
-  height: 80px;
-  display: block;
-}
-
-.tile--word {
-  gap: 6px;
-  padding-left: calc(10px + .28em);       /* balances the tracking after the last letter */
-  padding-right: 10px;
-  font-family: "Graduate", serif;
-  font-size: 14px;
-  letter-spacing: .28em;
-  line-height: 1;
-  color: var(--text);
-  white-space: nowrap;
-}
-.tile--word svg {
-  height: 14px;
-  width: auto;
-  fill: var(--icon);
-  flex: none;
-}
-
-.tile--bio {
-  display: block;
-  padding: 32px 0;                        /* 40px to the tiles above and below, with the gap */
-  border-radius: 0;
-  background: none;
-}
-.tile--bio p:last-child {
-  margin-bottom: 0;
-}
-
-.tile--social {
-  justify-content: space-around;
-}
-
-/* ===== Inline SVG icons (replaces Font Awesome) ===== */
-.social-icon {
-  color: var(--icon);
-  line-height: 0;
-  transition: opacity .15s ease-out;
-}
-.social-icon:hover {
-  opacity: .6;
-}
-.social-icon svg {
-  width: auto;
-  height: 28px;
-  display: block;
 }

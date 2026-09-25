@@ -5,9 +5,6 @@ title = "Josh Vaughen - Machine Learning Engineer in Seattle"
 disableKinds = ["section", "taxonomy", "RSS"]
 enableGitInfo = true
 
-# Copyright
-copyright = "&copy;2024 Josh Vaughen"
-
 [sitemap]
   changeFreq = 'monthly'
   disable = false
@@ -21,7 +18,7 @@ copyright = "&copy;2024 Josh Vaughen"
   firstName = "Josh"
   jobTitle = "Machine Learning Engineer"
   description = "Josh Vaughen is a machine learning engineer in Seattle who builds AI-integrated training systems, lifts heavy, and has solo-traveled 60+ countries."
-  shareImage = "images/profile.webp"
+  shareImage = "https://brand.ijosh.com/share/jshvn-share-1200x630.jpg"
   twitterHandle = "dvnll"
 
   # Social Links
@@ -32,9 +29,6 @@ copyright = "&copy;2024 Josh Vaughen"
     github = "https://github.com/jshvn"
     twitter = "https://x.com/dvnll"
 
-  [params.custom.css]
-    enable = true
-  
   [params.showemail]
     enable = true
 
@@ -47,20 +41,8 @@ copyright = "&copy;2024 Josh Vaughen"
   [params.showlocation]
     enable = true
 
-  # Section - Visual
-  [params.visual]
-
-    # Image
-    [params.visual.image]
-      enable = true
-      file = "images/profile.webp"
-      position = "center center"
-
-    # Video (alternative to image; keep disabled while the image is used)
-    [params.visual.video]
-      enable = false
-
-  # The original template is released under the Creative Commons Attribution 3.0 License.
-  # Please keep the original attribution link when using for your own project.
-  # If you'd like to use the template without the attribution, you can check out
-  # the license option via the template author's website: https://onepagelove.com/split
+  # The photo in the card
+  [params.visual.image]
+    enable = true
+    file = "https://brand.ijosh.com/photo/profile-1024.jpg"
+    position = "center 32%"

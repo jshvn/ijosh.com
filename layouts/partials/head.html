@@ -1,4 +1,3 @@
-{{- $img := resources.Get .Site.Params.shareImage -}}
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
@@ -47,22 +46,19 @@
 
 <meta property="og:locale" content="en_US">
 
+{{- /* The brand's share image (jshvn/brand share/): 1200 x 630, photo and mark together. */ -}}
 {{- with .Site.Params.shareImage }}
-  {{- with resources.Get . }}
-    {{- $card := .Fill "1200x630 smart jpg q85" }}
-    {{- $shareURL := $card.Permalink }}
-    <meta property="og:image" content="{{ $shareURL }}" />
-    <meta property="og:image:width" content="{{ $card.Width }}"/>
-    <meta property="og:image:height" content="{{ $card.Height }}"/>
+    <meta property="og:image" content="{{ . }}" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:alt" content="{{ $.Site.Params.author }} - {{ $.Site.Params.jobTitle }}" />
-    <meta name="twitter:image" content="{{ $shareURL }}" />
+    <meta name="twitter:image" content="{{ . }}" />
     <meta name="twitter:image:alt" content="{{ $.Site.Params.author }} - {{ $.Site.Params.jobTitle }}" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta itemprop="thumbnailUrl" content="{{ $shareURL }}"/>
-    <link rel="image_src" href="{{ $shareURL }}" />
-    <meta itemprop="image" content="{{ $shareURL }}"/>
-  {{- end }}
+    <meta itemprop="thumbnailUrl" content="{{ . }}"/>
+    <link rel="image_src" href="{{ . }}" />
+    <meta itemprop="image" content="{{ . }}"/>
 {{- end }}
 
 <script type="application/ld+json">
@@ -75,12 +71,7 @@
   "familyName": "Vaughen",
   "alternateName": ["ijosh", "joshthings", "Josh"],
   "url": "{{ .Site.BaseURL }}",
-  "image": {
-    "@type": "ImageObject",
-    "url": "{{ $img.Permalink }}",
-    "width": {{ $img.Width }},
-    "height": {{ $img.Height }}
-  },
+  "image": "{{ .Site.Params.visual.image.file }}",
   "jobTitle": "{{ .Site.Params.jobTitle }}",
   "description": "{{ .Site.Params.description }}",
   "knowsAbout": [
@@ -147,25 +138,16 @@
   <meta name="twitter:creator" content="@{{ . }}" />
 {{ end }}
 
-<!-- Styles: self-hosted fonts + theme CSS, concatenated, minified, fingerprinted (SRI + immutable caching) -->
-{{- $fonts := resources.Get "css/fonts.css" -}}
-{{- $split := resources.Get "css/split.css" -}}
-{{- $style := resources.Get "css/style.css" -}}
-{{- $css := slice $fonts $split $style | resources.Concat "css/bundle.css" | resources.Minify | resources.Fingerprint -}}
+<!-- Styles: the brand's tokens and fonts, then the page's own layer; concatenated, minified,
+     fingerprinted (SRI + immutable caching). tokens.css is a copy of brand.ijosh.com/tokens.css;
+     `task check:brand` diffs it. -->
+{{- $css := slice (resources.Get "css/tokens.css") (resources.Get "css/style.css") | resources.Concat "css/bundle.css" | resources.Minify | resources.Fingerprint -}}
 <link rel="preload" as="font" type="font/woff2" href="/fonts/montserrat-600-latin.woff2" crossorigin />
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
 
-<!-- Image styles + LCP preload -->
+<!-- LCP preload: the photo -->
 {{- if .Site.Params.visual.image.enable }}
-  {{- with .Site.Params.visual.image.file }}
-    {{- with resources.Get . }}
-      {{- $bg := .Resize "1600x webp q82" }}
-      <link rel="preload" as="image" href="{{ $bg.RelPermalink }}" type="image/webp" fetchpriority="high" />
-      <style>
-        .fs-split .split-image { background-image: url("{{ $bg.RelPermalink }}"); background-position: {{ if $.Site.Params.visual.image.position }}{{ $.Site.Params.visual.image.position }}{{ else }}center center{{ end }}; }
-      </style>
-    {{- end }}
-  {{- end }}
+<link rel="preload" as="image" href="{{ .Site.Params.visual.image.file }}" fetchpriority="high" />
 {{- end }}
 
 <!-- Google Analytics -->

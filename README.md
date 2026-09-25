@@ -1,7 +1,7 @@
 # 👨🏻‍💻 ijosh.com
 
 This repository contains the contents of [ijosh.com](https://ijosh.com) — a Hugo-based
-jamstack site, migrated from SquareSpace and deployed on Cloudflare Pages.
+jamstack site deployed on Cloudflare Pages.
 
 ***
 
@@ -11,8 +11,8 @@ Pushes to the `master` branch are picked up by Cloudflare and deployed live. Dev
 branch other than `master`, then merge when ready.
 
 The site is built to be **self-contained at runtime**: fonts and social icons are served
-from this domain (no Google Fonts / CDN calls on page load), favicons and the mark from
-[brand.ijosh.com](https://brand.ijosh.com) (also ours, from `jshvn/brand`), CSS is bundled +
+from this domain (no Google Fonts / CDN calls on page load), favicons, the mark and the photo
+from [brand.ijosh.com](https://brand.ijosh.com) (also ours, from `jshvn/brand`), CSS is bundled +
 minified + fingerprinted, and security headers ship via `static/_headers`.
 
 ## 💻 Development
@@ -27,17 +27,19 @@ task --list    # all tasks
 
 > **Cloudflare Pages settings (dashboard):** build command `hugo --minify --gc` (Hugo only
 > minifies HTML with that flag; CSS/fonts are minified by the asset pipeline), and pin the
-> **`HUGO_VERSION`** env var to the tested extended version (currently `0.163.3`; extended is
-> required for WebP image processing).
+> **`HUGO_VERSION`** env var to the tested extended version (currently `0.163.3`).
 
 ## 🎨 Assets
 
-- **Fonts** — self-hosted in `static/fonts/` (latin + latin-ext subsets) with `@font-face`
-  in `assets/css/fonts.css`. Regenerate from Google Fonts only if the font set changes.
+- **Tokens and fonts** — `assets/css/tokens.css` and `static/fonts/` are copies of the ones
+  brand.ijosh.com serves (colors, type roles, `@font-face`). Change them in `jshvn/brand` and
+  copy them over; `task check:brand` fails when a copy drifts.
 - **Icons** — the social/meta icons are inlined as SVG at build time from `assets/icons/`
   (sourced from Font Awesome Free 6.x). No icon font / CDN is loaded.
-- **CSS** — `assets/css/{fonts,split,style}.css` are concatenated, minified, and fingerprinted
+- **CSS** — `assets/css/{tokens,style}.css` are concatenated, minified, and fingerprinted
   into one `/css/bundle.<hash>.css` in `layouts/partials/head.html`.
+- **Field** — the grid background is `static/images/field-{light,dark}.svg`, written by
+  `task field` from `scripts/field.mjs`; `task check:field` fails if they drift.
 
 ## 🧪 Visual regression testing
 
@@ -47,15 +49,16 @@ golden baseline. First run creates a `.venv-visual/` (Pillow) and uses the machi
 ```sh
 task visual:check     # fail if the build drifts from the golden baseline
 task visual:bless     # re-capture the baseline (run after an intended UI change)
-task visual:vs-live   # compare the local content panel against the live ijosh.com
+task visual:vs-live   # compare the local page against the live ijosh.com
 ```
 
 Golden images live in `tests/visual/golden/` (committed). Diff artifacts land in
 `tests/visual/out/` (gitignored). **After any intentional visual change, re-run
 `task visual:bless` and commit the updated baseline.**
 
-## 👷🏻‍♂️ Theme
+## 👷🏻‍♂️ Design
 
-Adapted from the [Hugo Split theme](https://themes.gohugo.io/hugo-split-theme/) and merged
-with the color scheme of the older Squarespace site. A license was purchased so the theme
-attribution links can be removed.
+One card on the `jshvn/brand` grid field: the photo on the left with the place pinned to it,
+then the roles, the name, the bio, and a footer with the social links and the mark. On
+narrow screens the card stacks into a sheet, photo on top. Colors, type and the mark follow
+[brand.ijosh.com](https://brand.ijosh.com).

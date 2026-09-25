@@ -1,21 +1,6 @@
-{{- /* Name, mark, role tiles and place tile. The mark is two files on brand.ijosh.com,
-       one per color scheme; <picture> picks without JS. alt is the name, never "logo". */ -}}
-<div class="tile tile--name"><h1>{{ .Title }}</h1></div>
-
-<picture class="tile tile--mark">
-  <source srcset="https://brand.ijosh.com/mark/jshvn-mark-on-dark.svg" media="(prefers-color-scheme: dark)" />
-  <img src="https://brand.ijosh.com/mark/jshvn-mark-on-light.svg" alt="{{ .Site.Params.author }}" width="80" height="80" />
-</picture>
-
-{{- $roles := .Params.roles }}
-{{- if and (not $roles) .Params.tagline }}{{ $roles = split .Params.tagline ", " }}{{ end }}
-{{- range $roles }}
-<span class="tile tile--word">{{ . }}</span>
-{{- end }}
-
-{{- /* ponytail: with showlocation off the fourth slot stays empty; nothing else wants it */ -}}
-{{- if .Site.Params.showlocation.enable }}
-  {{- with .Params.location }}
-<span class="tile tile--word">{{ (resources.Get "icons/location-dot.svg").Content | safeHTML }}{{ . }}</span>
+<ul class="roles" aria-label="Roles">
+  {{- range .Params.roles }}
+  <li class="label">{{ . }}</li>
   {{- end }}
-{{- end }}
+</ul>
+<h1>{{ .Title }}</h1>
