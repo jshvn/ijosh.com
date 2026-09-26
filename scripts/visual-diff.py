@@ -2,7 +2,8 @@
 """Golden-snapshot visual regression check for the site.
 
 Locks the rendered pixels (light + dark, desktop + mobile) to golden baselines
-and fails the build on unintended drift.
+and fails the build on unintended drift. `check` also holds the weather canvas
+(assets/js/weather.js) to the field tile it covers.
 
 Modes:
   bless    capture the local build and save it as the golden baseline
@@ -48,7 +49,8 @@ def serve(directory: Path):
     return httpd, httpd.server_address[1]
 
 
-def shoot(browser, url: str, path: Path, w: int, h: int, scheme: str = "light", tries: int = 3) -> None:
+def shoot(browser, url: str, path: Path, w: int, h: int, scheme: str = "light", tries: int = 3,
+          motion: bool = False) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     # The photo and the mark load from brand.ijosh.com, and inside the toolbox Chromium now and
     # then aborts them with ERR_NETWORK_CHANGED. A capture with a failed request is retaken.
@@ -57,8 +59,14 @@ def shoot(browser, url: str, path: Path, w: int, h: int, scheme: str = "light", 
             viewport={"width": w, "height": h},
             device_scale_factor=1,
             color_scheme=scheme,
-            reduced_motion="reduce",  # neutralizes the entry fade -> deterministic capture
+            # Reduced motion neutralizes the entry fade and keeps the weather off -> a
+            # deterministic capture. With motion, the clock is held before the weather's first
+            # frame, and the screenshot finishes the fade.
+            reduced_motion="no-preference" if motion else "reduce",
         )
+        if motion:
+            page.clock.install(time=0)
+            page.clock.pause_at(1000)
         failed = []
         page.on("requestfailed", lambda r: failed.append(f"{r.url} {r.failure}")
                 if "cloudflareinsights.com" not in r.url else None)
@@ -66,7 +74,7 @@ def shoot(browser, url: str, path: Path, w: int, h: int, scheme: str = "light", 
         page.route("**cloudflareinsights.com**", lambda route: route.abort())
         page.goto(url, wait_until="load", timeout=30000)
         if not failed:
-            page.screenshot(path=str(path.resolve()), full_page=True)
+            page.screenshot(path=str(path.resolve()), full_page=True, animations="disabled")
             page.close()
             return
         page.close()
@@ -128,6 +136,16 @@ def cmd_check(args):
                     failed = failed or not ok
                     print(f"[{'PASS' if ok else 'FAIL'}] {tag}: {ratio * 100:.3f}% changed "
                           f"({changed}/{total}px, tol={args.tol}) -> {OUT / (tag + '-diff.png')}")
+                    # The weather's first frame is the tile itself, so the page with motion on
+                    # must match the still one. The field is too faint for --tol to see.
+                    moving = OUT / f"{tag}-motion.png"
+                    shoot(browser, f"http://127.0.0.1:{port}/", moving, w, h, scheme, motion=True)
+                    changed, total = diff(local, moving, OUT / f"{tag}-motion-diff.png", args.field_tol)
+                    ratio = changed / total
+                    ok = ratio <= args.threshold
+                    failed = failed or not ok
+                    print(f"[{'PASS' if ok else 'FAIL'}] {tag} weather at rest vs tile: {ratio * 100:.3f}% changed "
+                          f"({changed}/{total}px, tol={args.field_tol}) -> {OUT / (tag + '-motion-diff.png')}")
             browser.close()
     finally:
         httpd.shutdown()
@@ -165,6 +183,7 @@ def main():
 
     c = sub.add_parser("check")
     c.add_argument("--threshold", type=float, default=0.001, help="max changed-pixel ratio to pass (default: 0.001 = 0.1%%); margin over anti-aliasing noise, below real-regression signal")
+    c.add_argument("--field-tol", type=int, default=2, help="per-channel tolerance for the weather-vs-tile comparison; the field's tones sit within 22 of the page (default: 2)")
     c.set_defaults(func=cmd_check)
 
     v = sub.add_parser("vs-live")

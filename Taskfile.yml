@@ -28,7 +28,7 @@ tasks:
           "" \
           "${c}checks -- offline, changes nothing${r}" \
           "  task visual:check         Screenshot the build light and dark, desktop and mobile; diff against the goldens" \
-          "                            ${d}run after any change to layouts/ or assets/css/${r}" \
+          "                            ${d}and the weather at rest against the tile; run after any change to layouts/ or assets/${r}" \
           "  task check:meta           The built JSON parses; the email address is only in its mailto: link" \
           "  task check:field          The field tiles match what scripts/field.mjs writes" \
           "" \
