@@ -1,8 +1,9 @@
 // Weather: soft fronts of light and shade drift over the field. A canvas laid over the
 // field's tile redraws the same lattice, and a slow value noise over each cell's position
-// and time lifts or lowers its tone. It starts as the tile exactly and eases in over three
-// seconds. A visitor who asks for reduced motion, like a page without scripts, never gets
-// the canvas and sees the tile alone.
+// and time lifts or lowers its tone. Cells only ever take the grain's four tones at the
+// field's own opacity, so the weather moves the grain around and never outweighs the tile.
+// It starts as the tile exactly and eases in over three seconds. A visitor who asks for
+// reduced motion, like a page without scripts, never gets the canvas and sees the tile alone.
 import { SCHEMES, hash, shade } from './grain.mjs';
 
 const root = document.documentElement;
@@ -11,13 +12,10 @@ const card = document.querySelector('.card');
 const canvas = document.createElement('canvas');
 const ctx = canvas.getContext('2d');
 
-// A cell's look is one number, its level. 0 to 1 walks the four tones from faintest to
-// strongest at the field's opacity; 1 to LMAX raises the strongest tone's opacity to GLOW.
-// 60 steps a level land the tones' own levels (0, 1/3, 2/3, 1) exactly, so at rest the
-// canvas draws the tile's colors.
-const LMAX = 2.5;
-const STEPS = 150;
-const GLOW = { dark: 0.4, light: 0.27 };
+// A cell's look is one number, its level: 0 to 1 walks the four tones from faintest to
+// strongest at the field's opacity. 60 steps land the tones' own levels (0, 1/3, 2/3, 1)
+// exactly, so at rest the canvas draws the tile's colors.
+const STEPS = 60;
 
 const lerp = (a, b, f) => a + (b - a) * f;
 const smooth = (f) => f * f * (3 - 2 * f);
@@ -27,14 +25,11 @@ let bg = '';
 
 const recolor = () => {
   const style = getComputedStyle(root);
-  const scheme = style.colorScheme === 'dark' ? 'dark' : 'light';
-  const { tones, opacity } = SCHEMES[scheme];
+  const { tones, opacity } = SCHEMES[style.colorScheme === 'dark' ? 'dark' : 'light'];
   const rgb = tones.map((h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)));
   bg = style.getPropertyValue('--bg').trim();
   colors = Array.from({ length: STEPS + 1 }, (_, n) => {
-    const l = (n / STEPS) * LMAX;
-    if (l > 1) return `rgba(${rgb[0]},${lerp(opacity, GLOW[scheme], (l - 1) / (LMAX - 1))})`;
-    const q = (1 - l) * 3;
+    const q = (1 - n / STEPS) * 3;
     const i = Math.min(2, Math.floor(q));
     return `rgba(${rgb[i].map((v, k) => Math.round(lerp(v, rgb[i + 1][k], q - i)))},${opacity})`;
   });
@@ -100,7 +95,7 @@ const draw = () => {
       l += (n - 0.5) * 3.2 * amp;
       s *= 1 + (0.12 * n - 0.06) * amp;
     }
-    ctx.fillStyle = colors[Math.round((Math.min(LMAX, Math.max(0, l)) / LMAX) * STEPS)];
+    ctx.fillStyle = colors[Math.round(Math.min(1, Math.max(0, l)) * STEPS)];
     ctx.beginPath();
     ctx.roundRect(x + (size - s) / 2, y + (size - s) / 2, s, s, s / 5);
     ctx.fill();

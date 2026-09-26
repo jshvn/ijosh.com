@@ -46,8 +46,9 @@ task build     # production build → public/  (hugo --gc; hugo.toml minifies)
   `assets/js/lattice.js` rounds the card's height to the grid when the words are taller than
   the screen; everywhere else CSS does it.
 - **Weather** — `assets/js/weather.js` lays a canvas over the field and drifts soft fronts of
-  light and shade across it. It shares the field's grain (`assets/js/grain.mjs`) with
-  `scripts/field.mjs`, starts as the tile exactly, and never runs under reduced motion.
+  light and shade across it, moving cells only among the grain's four tones at the field's
+  own opacity. It shares the grain (`assets/js/grain.mjs`) with `scripts/field.mjs`, starts
+  as the tile exactly, and never runs under reduced motion.
 
 ## 🧪 Visual regression testing
 
