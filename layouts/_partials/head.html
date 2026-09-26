@@ -115,7 +115,10 @@
 <link rel="preload" as="font" type="font/woff2" href="/fonts/montserrat-600-latin.woff2" crossorigin />
 <link rel="preload" as="font" type="font/woff2" href="/fonts/pt-serif-400-latin.woff2" crossorigin />
 <link rel="stylesheet" href="{{ $css.RelPermalink }}" integrity="{{ $css.Data.Integrity }}" />
-{{- $js := resources.Get "js/lattice.js" | resources.Minify | resources.Fingerprint }}
+{{- /* Scripts: the lattice's rounding, then the weather, bundled with the grain it shares with
+       scripts/field.mjs; one file, minified and fingerprinted like the CSS. */}}
+{{- $weather := resources.Get "js/weather.js" | js.Build }}
+{{- $js := slice (resources.Get "js/lattice.js") $weather | resources.Concat "js/site.js" | resources.Minify | resources.Fingerprint }}
 <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}" defer></script>
 
 <!-- LCP preload: the photo -->

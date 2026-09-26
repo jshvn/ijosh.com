@@ -43,8 +43,11 @@ task build     # production build → public/  (hugo --gc; hugo.toml minifies)
   into one `/css/bundle.<hash>.css` in `layouts/_partials/head.html`.
 - **Field** — the grid background is `static/images/field-{light,dark}.svg`, written by
   `task field` from `scripts/field.mjs`; `task check:field` fails if they drift.
-  `assets/js/lattice.js`, the page's one script, rounds the card's height to the grid when
-  the words are taller than the screen; everywhere else CSS does it.
+  `assets/js/lattice.js` rounds the card's height to the grid when the words are taller than
+  the screen; everywhere else CSS does it.
+- **Weather** — `assets/js/weather.js` lays a canvas over the field and drifts soft fronts of
+  light and shade across it. It shares the field's grain (`assets/js/grain.mjs`) with
+  `scripts/field.mjs`, starts as the tile exactly, and never runs under reduced motion.
 
 ## 🧪 Visual regression testing
 
