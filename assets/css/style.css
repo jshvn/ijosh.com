@@ -4,7 +4,8 @@
    (scripts/field.mjs) whose lattice is anchored to the card's top-left corner, and the
    card's width and height are each a cell plus whole pitches, so every edge falls between
    cells and no cell is cut. A square .hole in the page color sits behind the rounded card,
-   so its corners show the page, not a cell.
+   so its corners show the page, not a cell. assets/js/weather.js lays a canvas over the
+   tile that redraws the same lattice in motion; the hole stays above it.
 
    The card fills the screen less an equal margin above and below, a height CSS can round.
    When its words are taller than that (a phone), the height comes from the words, and
@@ -49,6 +50,7 @@ h1, p, ul { margin: 0; padding: 0; }
    off horizontally, and half a tile is a whole number of pitches, so the lattice stays on
    the card. */
 .field {
+  position: relative;
   min-height: 100dvh;
   display: grid;
   justify-items: center;
@@ -56,8 +58,15 @@ h1, p, ul { margin: 0; padding: 0; }
   padding-block: var(--top);
   background: var(--field) calc(50% - var(--card-w) / 2) var(--top) / var(--tile) repeat;
 }
+.field > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
 
 .hole {
+  position: relative;
   width: var(--card-w);
   background: var(--bg);
 }
