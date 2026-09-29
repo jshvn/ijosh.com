@@ -5,6 +5,7 @@
     {{ if .Site.Params.showgithub.enable }}
     <a rel="me noopener" target="_blank" aria-label="GitHub (opens in new tab)" title="GitHub" href="{{ .Site.Params.social.github }}">{{ (resources.Get "icons/github.svg").Content | safeHTML }}</a>
     {{ end }}
+    <a rel="me noopener" target="_blank" aria-label="Strava (opens in new tab)" title="Strava" href="{{ .Site.Params.social.strava }}">{{ (resources.Get "icons/strava.svg").Content | safeHTML }}</a>
     {{ if .Site.Params.showtwitter.enable }}
     <a rel="me noopener" target="_blank" aria-label="X (opens in new tab)" title="X" href="{{ .Site.Params.social.twitter }}">{{ (resources.Get "icons/x-twitter.svg").Content | safeHTML }}</a>
     {{ end }}
