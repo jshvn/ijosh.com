@@ -25,6 +25,7 @@ enableGitInfo = true
     instagram = "https://www.instagram.com/joshthings"
     linkedin = "https://linkedin.com/in/ijosh"
     github = "https://github.com/jshvn"
+    strava = "https://www.strava.com/athletes/jshvn"
     twitter = "https://x.com/dvnll"
 
   [params.showemail]

@@ -11,6 +11,7 @@
 {{- end }}
 - [LinkedIn]({{ .linkedin }})
 - [Instagram]({{ .instagram }})
+- [Strava]({{ .strava }})
 {{- if site.Params.showtwitter.enable }}
 - [X]({{ .twitter }})
 {{- end }}
