@@ -1,4 +1,6 @@
 Contact: https://ijosh.com/
+Encryption: https://ijosh.com/pgp.txt
+Encryption: openpgp4fpr:255AB2457804EFE8E2BA907EE3592225286AB2F4
 Expires: 2027-08-01T00:00:00.000Z
 Preferred-Languages: en
 Canonical: https://ijosh.com/.well-known/security.txt

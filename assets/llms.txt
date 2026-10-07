@@ -17,3 +17,4 @@
 {{- end }}
 {{- end }}
 - [Email]({{ site.BaseURL }}): the address is on the page, not here
+- [OpenPGP key]({{ site.BaseURL }}pgp.txt): the fingerprint and the key for that address
