@@ -1,0 +1,37 @@
+OpenPGP public key for the email address on ijosh.com
+
+Fingerprint   255A B245 7804 EFE8 E2BA 907E E359 2225 286A B2F4
+Key           ed25519, created 2019-04-25, does not expire
+Served by     Web Key Directory on the address's own domain, kept current by Proton
+
+Fetch it through the directory, then compare the fingerprint with the one above:
+
+    gpg --locate-keys <the address>
+    gpg --fingerprint <the address>
+
+Or import this file, which carries the same key:
+
+    curl -s https://ijosh.com/pgp.txt | gpg --import
+
+The Encryption fields in https://ijosh.com/.well-known/security.txt name this file and
+this fingerprint.
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+Version: ProtonMail
+
+xjMEXMH6bxYJKwYBBAHaRw8BAQdA7xkJ9ObwjdeVTAfAOxGmdH4sp31RiCia
+k6gMiMxZARrNJSJqb3NoQHZhdWdoZW4ubmV0IiA8am9zaEB2YXVnaGVuLm5l
+dD7CdwQQFgoAHwUCXMH6bwYLCQcIAwIEFQgKAgMWAgECGQECGwMCHgEACgkQ
+41kiJShqsvQh3wEAjsRjlg0R+NyahzCs8rBo6LQSiHPug9wZNAbsJmlguAIB
+AJnkfXGtmPPGMkv7bTJRdjfmRfTHT4AAsck5sZWv5zIKwsAeBBAWCACQBYJj
+Tz4ABYMGwwtpCRDYBsGvWXjoxzUUAAAAAAAcABBzYWx0QG5vdGF0aW9ucy5v
+cGVucGdwanMub3JnJhgXeiEHoByn/O9K9d/6Viwcb3BlbnBncC1jYUBwcm90
+b24ubWUgPG9wZW5wZ3AtY2FAcHJvdG9uLm1lPhYhBAqGUv5dUzhgV4mf6dgG
+wa9ZeOjHAAAWUwEAq3eEJLG8+yhaOAPUJUr4uhoHZqmJt/wIrunhBfFQn24A
+/1/EwH8W/tbjW2R9uj4dCR8M6qxUTM84nlbPyilVVl4GzjgEXMH6bxIKKwYB
+BAGXVQEFAQEHQL8mlUprTUKLU6U2Ectiu1xk6MUDEa+AtsqzuhFKUjs2AwEI
+B8JhBBgWCAAJBQJcwfpvAhsMAAoJEONZIiUoarL0RhUA/RQ+N3md3oqO+Nc0
+DQOneAdV0GDNp/dawyiXI6IyCGN5AP98goyJfFNIh12btyKEvx2vSUW3J2fy
+WAckCRRGfZQ5AA==
+=WbwZ
+-----END PGP PUBLIC KEY BLOCK-----
