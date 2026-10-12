@@ -1,7 +1,11 @@
 # ijosh.com: a one-page Hugo site that Cloudflare Pages builds from master. Every task runs in
 # the toolbox image (docker/Dockerfile) with the repo mounted at /work, so a visual check here
 # renders exactly what the goldens hold; the host needs only a container engine and go-task.
+# Two tasks run on the host instead: check:brand (curl and cmp) and lint (task and jq).
 version: "3"
+
+set: [errexit, pipefail]
+silent: true
 
 vars:
   IMAGE: ijosh-toolbox
@@ -17,39 +21,47 @@ vars:
 tasks:
   default:
     desc: Print the menu
-    silent: true
-    # ponytail: hand-maintained menu, since go-task can neither group nor annotate
+    # ponytail: hand-maintained listing -- go-task can neither group nor annotate, so a new
+    # task means a row below; menu-drift fails until it has one. `task --list` stays the
+    # generated view.
     cmds:
       - |
-        b=$(printf '\033[1m'); c=$(printf '\033[1;36m'); d=$(printf '\033[2m'); r=$(printf '\033[0m')
-        printf '%s\n' \
-          "" \
-          "${b}ijosh.com${r}   ${d}the one-page site Cloudflare Pages builds from master${r}" \
-          "" \
-          "${c}checks -- offline, changes nothing${r}" \
-          "  task visual:check         Screenshot the build light and dark, desktop and mobile; diff against the goldens" \
-          "                            ${d}and the weather at rest against the tile; run after any change to layouts/ or assets/${r}" \
-          "  task check:meta           The built JSON parses; the email address is only in its mailto: link" \
-          "  task check:field          The field tiles match what scripts/field.mjs writes" \
-          "" \
-          "${c}checks -- reach the network, change nothing${r}" \
-          "  task check:brand          The brand files kept here match brand.ijosh.com" \
-          "                            ${d}runs on the host: curl and cmp only${r}" \
-          "  task visual:vs-live       Diff the local page against the live ijosh.com" \
-          "" \
-          "${c}build -- writes public/ or committed files${r}" \
-          "  task build                Production build into public/, as Pages runs it" \
-          "  task serve                Live-reloading server on http://localhost:1313" \
-          "  task field                Rewrite static/images/field-{light,dark}.svg" \
-          "  task visual:bless         Re-capture the goldens in tests/visual/golden/" \
-          "                            ${d}only after an intended visual change; commit the PNGs${r}" \
-          "" \
-          "${c}toolbox -- the image every task runs in${r}" \
-          "  task image                Build the toolbox image ({{.IMAGE}}, {{.ENGINE}})" \
-          "  task run -- <cmd>         Run any command inside it with the repo mounted" \
-          "  task clean                Remove build output, visual diffs and the image" \
-          "                            ${d}needed after a docker/Dockerfile edit; image presence is the freshness check${r}" \
-          ""
+        b= c= d= r=
+        if [ -t 1 ] && [ -z "${NO_COLOR:-}" ]; then
+          b=$(printf '\033[1m'); c=$(printf '\033[1;36m'); d=$(printf '\033[2m'); r=$(printf '\033[0m')
+        fi
+        group() { printf '\n%s   %s\n' "$c$1$r" "$d$2$r"; }
+        row() {
+          if [ ${#1} -le 26 ]; then printf '  %-26s %s\n' "$1" "$2"
+          else printf '  %s\n  %-26s %s\n' "$1" '' "$2"; fi
+          [ -z "${3:-}" ] || note "$3"
+        }
+        note() { printf '  %-26s %s\n' '' "$d$1$r"; }
+
+        printf '\n%s   %s\n' "${b}jshvn/ijosh.com${r}" "${d}the one-page site Cloudflare Pages builds from master${r}"
+
+        group read 'reaches the network, changes nothing'
+        row 'task check:brand' 'The brand files kept here match brand.ijosh.com' 'reaches brand.ijosh.com; runs on the host: curl and cmp only'
+        row 'task visual:vs-live' 'Diff the local page against the live ijosh.com' 'reaches https://ijosh.com from inside the image'
+
+        group checks 'offline, changes nothing'
+        row 'task visual:check' 'Screenshot the build and diff it against the goldens' 'light and dark, desktop and mobile, and the weather at rest against the tile'
+        note 'run after any change to layouts/ or assets/'
+        row 'task check:meta' 'The built JSON parses; the email address is only in its mailto: link'
+        row 'task check:field' 'The field tiles match what scripts/field.mjs writes'
+        row 'task lint' 'This menu against the tasks' 'runs on the host: task and jq'
+
+        group build 'writes public/ or committed files'
+        row 'task build' 'Production build into public/, as Pages runs it'
+        row 'task serve' 'Live-reloading server on http://localhost:1313'
+        row 'task field' 'Rewrite static/images/field-{light,dark}.svg'
+        row 'task visual:bless' 'Re-capture the goldens in tests/visual/golden/' 'only after an intended visual change; commit the PNGs'
+
+        group toolbox 'the image every task runs in: {{.IMAGE}}, {{.ENGINE}}'
+        row 'task image' 'Build it'
+        row 'task run -- <cmd>' 'Run any command inside it with the repo mounted'
+        row 'task clean' 'Remove build output, visual diffs and the image' 'needed after a docker/Dockerfile edit; image presence is the freshness check'
+        echo
 
   build:
     desc: Production build into public/, as Cloudflare Pages runs it
@@ -137,6 +149,25 @@ tasks:
         vars: { CLI_ARGS: hugo --gc }
       - task: run
         vars: { CLI_ARGS: python3 scripts/visual-diff.py vs-live }
+
+  lint:
+    desc: Fail if a task has no desc or no menu row, or a row names no task
+    cmds: [task: menu-drift]
+
+  # Every public task has a desc and a menu row, and every row names a task. default and
+  # help are the menu itself. Needs task and jq wherever lint runs.
+  menu-drift:
+    internal: true
+    cmds:
+      - |
+        rows=$(grep -oE "row ['\"]task [^ '\"]+" '{{.ROOT_TASKFILE}}' | sed -E "s/^row ['\"]task //" || true)
+        bad=$(task -t '{{.ROOT_TASKFILE}}' --list-all --json --no-status | jq -r --arg rows "$rows" '
+          ($rows | split("\n") | map(select(. != ""))) as $r
+          | [.tasks[] | select(.task != "default" and .task != "help")] as $t
+          | ($t[] | select(.desc == "") | "task \(.task): no desc; describe it or mark it internal"),
+            ($t[] | select(.task | IN($r[]) | not) | "task \(.task): no row in the menu"),
+            ($r[] | select(IN($t[].task) | not) | "row task \(.): no such task")')
+        [ -z "$bad" ] || { printf '%s\n' "$bad" >&2; exit 1; }
 
   image:
     desc: Build the toolbox image
