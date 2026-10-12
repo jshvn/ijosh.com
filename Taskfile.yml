@@ -38,7 +38,7 @@ tasks:
         }
         note() { printf '  %-26s %s\n' '' "$d$1$r"; }
 
-        printf '\n%s   %s\n' "${b}ijosh.com${r}" "${d}the one-page site Cloudflare Pages builds from master${r}"
+        printf '\n%s   %s\n' "${b}jshvn/ijosh.com${r}" "${d}the one-page site Cloudflare Pages builds from master${r}"
 
         group read 'reaches the network, changes nothing'
         row 'task check:brand' 'The brand files kept here match brand.ijosh.com' 'reaches brand.ijosh.com; runs on the host: curl and cmp only'
