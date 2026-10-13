@@ -15,7 +15,7 @@ enableGitInfo = true
   firstName = "Josh"
   lastName = "Vaughen"
   jobTitle = "Machine Learning Engineer"
-  description = "Josh Vaughen is a machine learning engineer in Seattle who builds AI-integrated training systems, lifts heavy, and has solo-traveled 60+ countries."
+  description = "Josh Vaughen is a machine learning engineer in Seattle who builds AI agents, data pipelines and open-source tools, lifts heavy, and has traveled to more than 60 countries."
   shareImage = "https://brand.ijosh.com/share/jshvn-share-1200x630.jpg"
   twitterHandle = "dvnll"
 
